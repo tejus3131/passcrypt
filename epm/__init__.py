@@ -1,6 +1,6 @@
 """Password Manager package."""
 
-from pm.main import PasswordManager
+from epm.main import PasswordManager
 
 __all__ = ['PasswordManager']
 __version__ = '0.1.0'
