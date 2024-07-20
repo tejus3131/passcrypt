@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pm"
+version = "0.1.0"
+description = "a module for testing new python features"
+authors = ["tejus3131 <tejus3131@gmail.com>"]
+license = "None"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+rich = "^13.7.1"
+pyperclip = "^1.9.0"
+inquirerpy = "^0.3.4"
+cryptography = "^42.0.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+pm = "pm:main"
