@@ -912,7 +912,7 @@ class UserInterface:
 
         :return: None
         """
-        self.show_info("Press ENTER to continue.")
+        self.show_info("\nPress ENTER to continue.")
         input()
 
     def show_error(self, message: str) -> None:
@@ -1075,14 +1075,19 @@ class PasswordManager:
 
         :return: None
         """
+        logging.info("Starting PassCrypt Application")
         if not os.path.exists(PATHS["STORAGE_FILE"]):
+            logging.info("Initializing PassCrypt")
             status, self.storage = self.init_pm()
         else:
+            logging.info("Logging into PassCrypt")
             status, self.storage = self.login()
 
         if status:
+            logging.info("Access granted!")
             self.main_menu()
         else:
+            logging.error("Access denied!")
             self.ui.show_error(
                 "An error occurred while initializing the Password Manager")
 
@@ -1257,6 +1262,7 @@ class PasswordManager:
         self.ui.show_success(
             f"Password for {site} - {username} added successfully!")
         pyperclip.copy(self.storage.get_password_for_site(site, username))
+        logging.info(f"Password for {site} - {username} added successfully!")
 
     def remove_password(self) -> None:
         """
@@ -1299,6 +1305,7 @@ class PasswordManager:
             self.storage.remove_password(site, username)
             self.ui.show_success(
                 f"Password for {site} - {username} removed successfully!")
+            logging.info(f"Password for {site} - {username} removed successfully!")
         else:
             self.ui.show_info(
                 f"Returning to the Main Menu.")
@@ -1399,6 +1406,8 @@ class PasswordManager:
             previous_site, previous_user, new_site, new_user, new_password)
         self.ui.show_success(
             f"Password for {previous_site} - {previous_user} edited successfully!")
+        logging.info(
+            f"Password for {previous_site} - {previous_user} edited successfully!")
 
     def list_all(self) -> None:
         """
@@ -1409,6 +1418,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
 
         self.ui.new_page("List All Passwords",
@@ -1448,6 +1458,8 @@ class PasswordManager:
             pyperclip.copy(self.storage.get_password_for_site(site, username))
             self.ui.show_success(
                 f"Password for {site} - {username} copied to clipboard!\nReturning to the Main Menu.")
+            logging.info(
+                f"Password for {site} - {username} copied to clipboard!")
         else:
             self.ui.show_info(
                 "Returning to the Main Menu.")
@@ -1494,6 +1506,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
 
         self.ui.new_page("Clear Logs", "Press ctrl+c to abort.")
@@ -1504,6 +1517,7 @@ class PasswordManager:
         ) == 'y':
             self.storage.clear_logs()
             self.ui.show_success("Logs cleared successfully!")
+            logging.info("Logs cleared successfully!")
         else:
             self.ui.show_info("Returning to the Main Menu.")
 
@@ -1527,6 +1541,7 @@ class PasswordManager:
         ) == 'y':
             os.remove(PATHS["STORAGE_FILE"])
             self.ui.show_success("PassCrypt storage removed successfully!")
+            logging.info("PassCrypt storage removed successfully!")
             os.system('cls' if os.name == 'nt' else 'clear')
             sys.exit(0)
         else:
@@ -1541,6 +1556,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
         self.ui.new_page("Export PassCrypt Logs", "Press ctrl+c to abort.")
         self.ui.show_info_panel(
@@ -1559,6 +1575,7 @@ class PasswordManager:
         path = self.storage.export_logs()
         self.ui.show_success(
             f"PassCrypt logs exported successfully!\nFile saved at: {path}\nReturning to the Main Menu.")
+        logging.info("PassCrypt logs exported successfully!")
 
         self.ui.wait()
 
@@ -1571,6 +1588,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
 
         self.ui.new_page("Export PassCrypt Storage",
@@ -1596,6 +1614,7 @@ class PasswordManager:
         path = self.storage.export_storage(secret)
         self.ui.show_success(
             f"PassCrypt storage exported successfully!\nFile saved at: {path}\nReturning to the Main Menu.")
+        logging.info("PassCrypt storage exported successfully to: " + path)
 
         self.ui.wait()
 
@@ -1608,6 +1627,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
         self.ui.new_page("Import PassCrypt Storage",
                          "Press ctrl+c to abort.")
@@ -1628,7 +1648,7 @@ class PasswordManager:
         self.storage.import_storage(final_password, path, self.ui.ui_input)
         self.ui.show_success(
             "PassCrypt storage imported successfully!\nReturning to the Main Menu.")
-
+        logging.info("PassCrypt storage imported successfully!")
         self.ui.wait()
 
     def clear_all_data(self) -> None:
@@ -1640,6 +1660,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
 
         self.ui.new_page("Clear All Data", "Press ctrl+c to abort.")
@@ -1657,6 +1678,7 @@ class PasswordManager:
             return
         self.storage.clear_all_data()
         self.ui.show_success("All passwords cleared successfully!")
+        logging.info("All passwords cleared successfully!")
 
     def change_master_password(self) -> None:
         """
@@ -1667,6 +1689,7 @@ class PasswordManager:
         if not self.storage:
             self.ui.show_error(
                 "An error occurred while accessing the storage.")
+            logging.error("An error occurred while accessing the storage.")
             return
         self.ui.new_page("Reset Master Password",
                          "Press ctrl+c to abort.")
@@ -1679,6 +1702,7 @@ class PasswordManager:
         new_password = self.generate_master()
         self.storage.change_master_password(new_password)
         self.ui.show_success("Master Password reset successfully!")
+        logging.info("Master Password reset successfully!")
 
 
 def main():
@@ -1692,9 +1716,13 @@ def main():
         passcrypt()
     except KeyboardInterrupt:
         print("\nExiting PassCrypt...")
+        logging.info("Exiting PassCrypt")
         sleep(1)
         os.system('cls' if os.name == 'nt' else 'clear')
         sys.exit(0)
+    except Exception as e:
+        logging.error("An error occurred while running PassCrypt.")
+        logging.error(str(e))
 
 
 if __name__ == "__main__":
