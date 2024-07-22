@@ -278,6 +278,42 @@ pygments = ">=2.13.0,<3.0.0"
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
+name = "typing-extensions"
+version = "4.12.2"
+description = "Backported and Experimental Type Hints for Python 3.8+"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
+    {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
+]
+
+[[package]]
+name = "urwid"
+version = "2.6.15"
+description = "A full-featured console (xterm et al.) user interface library"
+optional = false
+python-versions = ">3.7"
+files = [
+    {file = "urwid-2.6.15-py3-none-any.whl", hash = "sha256:71b3171cabaa0092902f556768756bd2f2ebb24c0da287ee08f081d235340cb7"},
+    {file = "urwid-2.6.15.tar.gz", hash = "sha256:9ecc57330d88c8d9663ffd7092a681674c03ff794b6330ccfef479af7aa9671b"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+wcwidth = "*"
+
+[package.extras]
+curses = ["windows-curses"]
+glib = ["PyGObject"]
+lcd = ["pyserial"]
+serial = ["pyserial"]
+tornado = ["tornado (>=5.0)"]
+trio = ["exceptiongroup", "trio (>=0.22.0)"]
+twisted = ["twisted"]
+zmq = ["zmq"]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.13"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -291,4 +327,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e9a8a6d4f7af032242efb3f511b7babe2fb7648fa6d9ffcbde77d6fae0f1825b"
+content-hash = "381462b310903bd6ec8891835adaf9bab286a37d1ca5a99efbd259eb49528c51"
