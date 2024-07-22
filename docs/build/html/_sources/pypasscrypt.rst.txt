@@ -1,0 +1,21 @@
+pypasscrypt package
+===================
+
+Submodules
+----------
+
+pypasscrypt.main module
+-----------------------
+
+.. automodule:: pypasscrypt.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: pypasscrypt
+   :members:
+   :undoc-members:
+   :show-inheritance:

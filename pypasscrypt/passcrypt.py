@@ -38,6 +38,12 @@ SIMILAR_CHARS: Dict[str, str] = {
     "a": "4", "4": "a",
     "t": "7", "7": "t"
 }
+"""
+Dictionary of characters that are visually similar and can be easily confused.
+
+Key-value pairs where the key is a character and the value is a string
+of characters that look similar to the key.
+"""
 
 CONTEXT_FILTER: List[str] = [
     "gmail", "email", "com", "in", "co", "uk", "outlook",
@@ -55,21 +61,59 @@ CONTEXT_FILTER: List[str] = [
     "public", "demo", "example", "temp", "temp123",
     "tempuser", "publicuser", "public123", "trial", "trial123"
 ]
+"""
+List of context filters to exclude from password generation.
+
+Contains strings that are commonly used in passwords and should be avoided
+to ensure the generated passwords are secure.
+"""
 
 APPLICATION_NAME = "PassCrypt"
+"""
+The name of the application.
+"""
 
 LOCATION = os.getenv('PROGRAMDATA', "")
+"""
+The location to store the application data.
+"""
+
 DIRECTORY = ".passcrypt"
+"""
+The directory to store the application data.
+"""
+
 FILENAME = "passcrypt"
+"""
+The name of the storage file.
+"""
+
 EXTENSION = "epc"
+"""
+The extension of the storage file.
+"""
+
 DOWNLOADS = os.path.join(Path.home(), "Downloads")
+"""
+The default downloads directory.
+"""
+
 EXPORT_DIRECTORY = "passcrypt_exports"
+"""
+The directory to store exported data.
+"""
 
 PATHS = {
     'LOG_FILE': os.path.join(LOCATION, DIRECTORY, f"{FILENAME}.log"),
     'STORAGE_FILE': os.path.join(LOCATION, DIRECTORY, f"{FILENAME}.{EXTENSION}"),
     'EXPORT_PATH': os.path.join(DOWNLOADS, EXPORT_DIRECTORY)
 }
+"""
+Dictionary of paths used by the application.
+
+Contains key-value pairs where the key is a description of the path
+and the value is the actual path used by the application.
+"""
 
 if not os.path.exists(PATHS['LOG_FILE']):
     os.makedirs(os.path.dirname(PATHS['LOG_FILE']), exist_ok=True)

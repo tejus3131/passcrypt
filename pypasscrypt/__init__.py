@@ -6,20 +6,20 @@ encryption, and storage.
 """
 
 # Utility classes
-from pypasscrypt.main import UserInterface, Storage, CryptoHandler, PasswordGenerator
+from pypasscrypt.passcrypt import UserInterface, Storage, CryptoHandler, PasswordGenerator, PasswordManager
 
 # Password Generation
-from pypasscrypt.main import SIMILAR_CHARS, CONTEXT_FILTER
+from pypasscrypt.passcrypt import SIMILAR_CHARS, CONTEXT_FILTER
 
 # Constants
-from pypasscrypt.main import (
+from pypasscrypt.passcrypt import (
     EXTENSION, EXPORT_DIRECTORY, APPLICATION_NAME,
     DIRECTORY, FILENAME, DOWNLOADS, PATHS
 )
 
 # Public API
 __all__ = [
-    'UserInterface', 'Storage', 'CryptoHandler', 'PasswordGenerator',
+    'UserInterface', 'Storage', 'CryptoHandler', 'PasswordGenerator', 'PasswordManager',
     'SIMILAR_CHARS', 'CONTEXT_FILTER', 'EXTENSION', 'EXPORT_DIRECTORY',
     'APPLICATION_NAME', 'DIRECTORY', 'FILENAME', 'DOWNLOADS', 'PATHS',
     '__version__', '__author__', '__email__', '__license__', '__url__',
