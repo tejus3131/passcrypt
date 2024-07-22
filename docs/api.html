@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; PassCrypt 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PassCrypt
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cryptohandler">CryptoHandler</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.CryptoHandler"><code class="docutils literal notranslate"><span class="pre">CryptoHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.CryptoHandler.get_cipher"><code class="docutils literal notranslate"><span class="pre">CryptoHandler.get_cipher()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.CryptoHandler.encrypt"><code class="docutils literal notranslate"><span class="pre">CryptoHandler.encrypt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.CryptoHandler.decrypt"><code class="docutils literal notranslate"><span class="pre">CryptoHandler.decrypt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.CryptoHandler.hash"><code class="docutils literal notranslate"><span class="pre">CryptoHandler.hash()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#passwordgenerator">PasswordGenerator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordGenerator"><code class="docutils literal notranslate"><span class="pre">PasswordGenerator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordGenerator.is_valid_context"><code class="docutils literal notranslate"><span class="pre">PasswordGenerator.is_valid_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordGenerator.break_context"><code class="docutils literal notranslate"><span class="pre">PasswordGenerator.break_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordGenerator.generate_password"><code class="docutils literal notranslate"><span class="pre">PasswordGenerator.generate_password()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#storage">Storage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage"><code class="docutils literal notranslate"><span class="pre">Storage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.__init__"><code class="docutils literal notranslate"><span class="pre">Storage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.validate_secret"><code class="docutils literal notranslate"><span class="pre">Storage.validate_secret()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.add_password"><code class="docutils literal notranslate"><span class="pre">Storage.add_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.remove_password"><code class="docutils literal notranslate"><span class="pre">Storage.remove_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.edit_password"><code class="docutils literal notranslate"><span class="pre">Storage.edit_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.list_all"><code class="docutils literal notranslate"><span class="pre">Storage.list_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.get_all_sites"><code class="docutils literal notranslate"><span class="pre">Storage.get_all_sites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.get_all_usernames"><code class="docutils literal notranslate"><span class="pre">Storage.get_all_usernames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.get_username_for_site"><code class="docutils literal notranslate"><span class="pre">Storage.get_username_for_site()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.get_password_for_site"><code class="docutils literal notranslate"><span class="pre">Storage.get_password_for_site()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.site_exist"><code class="docutils literal notranslate"><span class="pre">Storage.site_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.username_exist"><code class="docutils literal notranslate"><span class="pre">Storage.username_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.clear_all_data"><code class="docutils literal notranslate"><span class="pre">Storage.clear_all_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.clear_logs"><code class="docutils literal notranslate"><span class="pre">Storage.clear_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.change_master_password"><code class="docutils literal notranslate"><span class="pre">Storage.change_master_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.export_storage"><code class="docutils literal notranslate"><span class="pre">Storage.export_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.export_logs"><code class="docutils literal notranslate"><span class="pre">Storage.export_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.Storage.import_storage"><code class="docutils literal notranslate"><span class="pre">Storage.import_storage()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#userinterface">UserInterface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface"><code class="docutils literal notranslate"><span class="pre">UserInterface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.add_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.add_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.remove_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.remove_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.edit_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.edit_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.list_all"><code class="docutils literal notranslate"><span class="pre">UserInterface.list_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.settings"><code class="docutils literal notranslate"><span class="pre">UserInterface.settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.clear_logs"><code class="docutils literal notranslate"><span class="pre">UserInterface.clear_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.remove_pc"><code class="docutils literal notranslate"><span class="pre">UserInterface.remove_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.export_logs"><code class="docutils literal notranslate"><span class="pre">UserInterface.export_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.export_pc"><code class="docutils literal notranslate"><span class="pre">UserInterface.export_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.import_pc"><code class="docutils literal notranslate"><span class="pre">UserInterface.import_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.clear_all_data"><code class="docutils literal notranslate"><span class="pre">UserInterface.clear_all_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.change_master_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.change_master_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.__init__"><code class="docutils literal notranslate"><span class="pre">UserInterface.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.clear_console"><code class="docutils literal notranslate"><span class="pre">UserInterface.clear_console()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.clear_last_line"><code class="docutils literal notranslate"><span class="pre">UserInterface.clear_last_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.new_page"><code class="docutils literal notranslate"><span class="pre">UserInterface.new_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.create_table"><code class="docutils literal notranslate"><span class="pre">UserInterface.create_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.get_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.get_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.master_validation"><code class="docutils literal notranslate"><span class="pre">UserInterface.master_validation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.get_master_password"><code class="docutils literal notranslate"><span class="pre">UserInterface.get_master_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.get_selection"><code class="docutils literal notranslate"><span class="pre">UserInterface.get_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.get_input"><code class="docutils literal notranslate"><span class="pre">UserInterface.get_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.ui_input"><code class="docutils literal notranslate"><span class="pre">UserInterface.ui_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.wait"><code class="docutils literal notranslate"><span class="pre">UserInterface.wait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_error"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_success"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_success()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_info"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_warning"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_greet_panel"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_greet_panel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_warning_panel"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_warning_panel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_error_panel"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_error_panel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_success_panel"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_success_panel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.UserInterface.show_info_panel"><code class="docutils literal notranslate"><span class="pre">UserInterface.show_info_panel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#passwordmanager">PasswordManager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager"><code class="docutils literal notranslate"><span class="pre">PasswordManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.__init__"><code class="docutils literal notranslate"><span class="pre">PasswordManager.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.__call__"><code class="docutils literal notranslate"><span class="pre">PasswordManager.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.init_pm"><code class="docutils literal notranslate"><span class="pre">PasswordManager.init_pm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.generate_master"><code class="docutils literal notranslate"><span class="pre">PasswordManager.generate_master()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.login"><code class="docutils literal notranslate"><span class="pre">PasswordManager.login()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.main_menu"><code class="docutils literal notranslate"><span class="pre">PasswordManager.main_menu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.authenticate"><code class="docutils literal notranslate"><span class="pre">PasswordManager.authenticate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.add_password"><code class="docutils literal notranslate"><span class="pre">PasswordManager.add_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.remove_password"><code class="docutils literal notranslate"><span class="pre">PasswordManager.remove_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.edit_password"><code class="docutils literal notranslate"><span class="pre">PasswordManager.edit_password()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.list_all"><code class="docutils literal notranslate"><span class="pre">PasswordManager.list_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.settings"><code class="docutils literal notranslate"><span class="pre">PasswordManager.settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.clear_logs"><code class="docutils literal notranslate"><span class="pre">PasswordManager.clear_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.remove_pc"><code class="docutils literal notranslate"><span class="pre">PasswordManager.remove_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.export_logs"><code class="docutils literal notranslate"><span class="pre">PasswordManager.export_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.export_pc"><code class="docutils literal notranslate"><span class="pre">PasswordManager.export_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.import_pc"><code class="docutils literal notranslate"><span class="pre">PasswordManager.import_pc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.clear_all_data"><code class="docutils literal notranslate"><span class="pre">PasswordManager.clear_all_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pypasscrypt.passcrypt.PasswordManager.change_master_password"><code class="docutils literal notranslate"><span class="pre">PasswordManager.change_master_password()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.SIMILAR_CHARS"><code class="docutils literal notranslate"><span class="pre">SIMILAR_CHARS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.CONTEXT_FILTER"><code class="docutils literal notranslate"><span class="pre">CONTEXT_FILTER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.APPLICATION_NAME"><code class="docutils literal notranslate"><span class="pre">APPLICATION_NAME</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.LOCATION"><code class="docutils literal notranslate"><span class="pre">LOCATION</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.DIRECTORY"><code class="docutils literal notranslate"><span class="pre">DIRECTORY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.FILENAME"><code class="docutils literal notranslate"><span class="pre">FILENAME</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.EXTENSION"><code class="docutils literal notranslate"><span class="pre">EXTENSION</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.DOWNLOADS"><code class="docutils literal notranslate"><span class="pre">DOWNLOADS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.EXPORT_DIRECTORY"><code class="docutils literal notranslate"><span class="pre">EXPORT_DIRECTORY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pypasscrypt.passcrypt.PATHS"><code class="docutils literal notranslate"><span class="pre">PATHS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PassCrypt</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This page contains detailed API documentation for the PassCrypt package.</p>
+<section id="cryptohandler">
+<h2>CryptoHandler<a class="headerlink" href="#cryptohandler" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CryptoHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">CryptoHandler</span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#CryptoHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.CryptoHandler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to handle encryption and decryption of data using Fernet symmetric encryption.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CryptoHandler.get_cipher">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_cipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Fernet</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#CryptoHandler.get_cipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.CryptoHandler.get_cipher" title="Link to this definition"></a></dt>
+<dd><p>Generate a Fernet cipher object using the input string as the key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> – The input string to generate the key.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Fernet cipher object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CryptoHandler.encrypt">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#CryptoHandler.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.CryptoHandler.encrypt" title="Link to this definition"></a></dt>
+<dd><p>Encrypt the given data using the provided password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – The data to encrypt, as a dictionary.</p></li>
+<li><p><strong>password</strong> – The password to use for encryption.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Encrypted data as bytes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CryptoHandler.decrypt">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encrypted_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#CryptoHandler.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.CryptoHandler.decrypt" title="Link to this definition"></a></dt>
+<dd><p>Decrypt the given encrypted data using the provided password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encrypted_data</strong> – The data to decrypt, as bytes.</p></li>
+<li><p><strong>password</strong> – The password to use for decryption.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decrypted data as a dictionary.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exception if decryption fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CryptoHandler.hash">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#CryptoHandler.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.CryptoHandler.hash" title="Link to this definition"></a></dt>
+<dd><p>Compute the SHA-256 hash of the given data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – The data to hash, as a string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The SHA-256 hash of the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="passwordgenerator">
+<h2>PasswordGenerator<a class="headerlink" href="#passwordgenerator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">PasswordGenerator</span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordGenerator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to generate passwords based on given context and constraints.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordGenerator.is_valid_context">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordGenerator.is_valid_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordGenerator.is_valid_context" title="Link to this definition"></a></dt>
+<dd><p>Check if the string matches any context filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> – The string to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the string does not match any context filter, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordGenerator.break_context">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">break_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordGenerator.break_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordGenerator.break_context" title="Link to this definition"></a></dt>
+<dd><p>Break the context into smaller parts based on non-word characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> – The string to break.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of valid context parts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordGenerator.generate_password">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_case</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_case</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numbers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_similar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordGenerator.generate_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordGenerator.generate_password" title="Link to this definition"></a></dt>
+<dd><p>Generate a password based on the given parameters and context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – The list of context strings.</p></li>
+<li><p><strong>length</strong> – The desired length of the password.</p></li>
+<li><p><strong>upper_case</strong> – Whether to include uppercase letters.</p></li>
+<li><p><strong>lower_case</strong> – Whether to include lowercase letters.</p></li>
+<li><p><strong>numbers</strong> – Whether to include numbers.</p></li>
+<li><p><strong>symbols</strong> – Whether to include symbols.</p></li>
+<li><p><strong>exclude_similar</strong> – Whether to exclude similar characters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated password.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the length is not a positive number or no character types are allowed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="storage">
+<h2>Storage<a class="headerlink" href="#storage" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to manage storage of passwords securely.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the Storage object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>password</strong> – The master password for the storage.</p></li>
+<li><p><strong>new</strong> – Whether to create a new storage file or load an existing one.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.validate_secret">
+<span class="sig-name descname"><span class="pre">validate_secret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.validate_secret"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.validate_secret" title="Link to this definition"></a></dt>
+<dd><p>Validate the secret against the master password hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>secret</strong> – The secret to validate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the secret is valid, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.add_password">
+<span class="sig-name descname"><span class="pre">add_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.add_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.add_password" title="Link to this definition"></a></dt>
+<dd><p>Add a password to the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site for which the password is being added.</p></li>
+<li><p><strong>username</strong> – The username associated with the password.</p></li>
+<li><p><strong>password</strong> – The password to store.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.remove_password">
+<span class="sig-name descname"><span class="pre">remove_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.remove_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.remove_password" title="Link to this definition"></a></dt>
+<dd><p>Remove a password from the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site for which the password is being removed.</p></li>
+<li><p><strong>username</strong> – The username associated with the password.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.edit_password">
+<span class="sig-name descname"><span class="pre">edit_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.edit_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.edit_password" title="Link to this definition"></a></dt>
+<dd><p>Edit a password in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site for which the password is being edited.</p></li>
+<li><p><strong>username</strong> – The username associated with the password.</p></li>
+<li><p><strong>new_site</strong> – The new site for the password.</p></li>
+<li><p><strong>new_username</strong> – The new username associated with the password.</p></li>
+<li><p><strong>new_password</strong> – The new password to store.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.list_all">
+<span class="sig-name descname"><span class="pre">list_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.list_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.list_all" title="Link to this definition"></a></dt>
+<dd><p>List all passwords in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of all passwords in the storage.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.get_all_sites">
+<span class="sig-name descname"><span class="pre">get_all_sites</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.get_all_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.get_all_sites" title="Link to this definition"></a></dt>
+<dd><p>Get all sites in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of all sites in the storage.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.get_all_usernames">
+<span class="sig-name descname"><span class="pre">get_all_usernames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.get_all_usernames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.get_all_usernames" title="Link to this definition"></a></dt>
+<dd><p>Get all usernames for a site in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of all usernames in the storage.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.get_username_for_site">
+<span class="sig-name descname"><span class="pre">get_username_for_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.get_username_for_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.get_username_for_site" title="Link to this definition"></a></dt>
+<dd><p>Get the username for a site in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>site</strong> – The site for which to retrieve the username.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of usernames for the site.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.get_password_for_site">
+<span class="sig-name descname"><span class="pre">get_password_for_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.get_password_for_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.get_password_for_site" title="Link to this definition"></a></dt>
+<dd><p>Get the password for a site in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site for which to retrieve the password.</p></li>
+<li><p><strong>username</strong> – The username associated with the password.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The password for the site, or None if not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.site_exist">
+<span class="sig-name descname"><span class="pre">site_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.site_exist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.site_exist" title="Link to this definition"></a></dt>
+<dd><p>Check if a site exists in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>site</strong> – The site to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the site exists, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.username_exist">
+<span class="sig-name descname"><span class="pre">username_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.username_exist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.username_exist" title="Link to this definition"></a></dt>
+<dd><p>Check if a username exists for a site in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site to check.</p></li>
+<li><p><strong>username</strong> – The username to check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the username exists, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.clear_all_data">
+<span class="sig-name descname"><span class="pre">clear_all_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.clear_all_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.clear_all_data" title="Link to this definition"></a></dt>
+<dd><p>Clear all passwords from the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.clear_logs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.clear_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.clear_logs" title="Link to this definition"></a></dt>
+<dd><p>Clear the logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.change_master_password">
+<span class="sig-name descname"><span class="pre">change_master_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.change_master_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.change_master_password" title="Link to this definition"></a></dt>
+<dd><p>Change the master password for the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_password</strong> – The new master password.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.export_storage">
+<span class="sig-name descname"><span class="pre">export_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.export_storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.export_storage" title="Link to this definition"></a></dt>
+<dd><p>Export the storage data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>secret</strong> – The secret to encrypt the storage data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The encrypted storage data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.export_logs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.export_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.export_logs" title="Link to this definition"></a></dt>
+<dd><p>Export the logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The path to the exported logs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.Storage.import_storage">
+<span class="sig-name descname"><span class="pre">import_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confirm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#Storage.import_storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.Storage.import_storage" title="Link to this definition"></a></dt>
+<dd><p>Import the storage data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>secret</strong> – The secret to decrypt the storage data.</p></li>
+<li><p><strong>file_path</strong> – The path to the file to import.</p></li>
+<li><p><strong>confirm</strong> – The confirmation function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the import is successful, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="userinterface">
+<h2>UserInterface<a class="headerlink" href="#userinterface" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">UserInterface</span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to handle the user interface for the Password Manager.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.add_password">
+<span class="sig-name descname"><span class="pre">add_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.add_password" title="Link to this definition"></a></dt>
+<dd><p>Add a password to the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.remove_password">
+<span class="sig-name descname"><span class="pre">remove_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.remove_password" title="Link to this definition"></a></dt>
+<dd><p>Remove a password from the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.edit_password">
+<span class="sig-name descname"><span class="pre">edit_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.edit_password" title="Link to this definition"></a></dt>
+<dd><p>Edit a password in the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.list_all">
+<span class="sig-name descname"><span class="pre">list_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.list_all" title="Link to this definition"></a></dt>
+<dd><p>List all passwords in the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.settings">
+<span class="sig-name descname"><span class="pre">settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.settings" title="Link to this definition"></a></dt>
+<dd><p>Display the settings menu.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.clear_logs">
+<span class="sig-name descname"><span class="pre">clear_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.clear_logs" title="Link to this definition"></a></dt>
+<dd><p>Clear the logs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.remove_pc">
+<span class="sig-name descname"><span class="pre">remove_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.remove_pc" title="Link to this definition"></a></dt>
+<dd><p>Remove the PassCrypt storage file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.export_logs">
+<span class="sig-name descname"><span class="pre">export_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.export_logs" title="Link to this definition"></a></dt>
+<dd><p>Export the PassCrypt logs to a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.export_pc">
+<span class="sig-name descname"><span class="pre">export_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.export_pc" title="Link to this definition"></a></dt>
+<dd><p>Export the PassCrypt storage to a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.import_pc">
+<span class="sig-name descname"><span class="pre">import_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.import_pc" title="Link to this definition"></a></dt>
+<dd><p>Import a PassCrypt storage from a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.clear_all_data">
+<span class="sig-name descname"><span class="pre">clear_all_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.clear_all_data" title="Link to this definition"></a></dt>
+<dd><p>Clear all passwords from the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.change_master_password">
+<span class="sig-name descname"><span class="pre">change_master_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.change_master_password" title="Link to this definition"></a></dt>
+<dd><p>Change the master password for the storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the UserInterface object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.clear_console">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_console</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.clear_console"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.clear_console" title="Link to this definition"></a></dt>
+<dd><p>Clear the terminal screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.clear_last_line">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_last_line</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.clear_last_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.clear_last_line" title="Link to this definition"></a></dt>
+<dd><p>Clear the last line in the terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.new_page">
+<span class="sig-name descname"><span class="pre">new_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.new_page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.new_page" title="Link to this definition"></a></dt>
+<dd><p>Print a new page separator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the page.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the page.</p></li>
+<li><p><strong>message</strong> – The message to show in panel.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.create_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.create_table" title="Link to this definition"></a></dt>
+<dd><p>Create a table with the given title, headers, and data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the table.</p></li>
+<li><p><strong>headers</strong> – The headers of the table.</p></li>
+<li><p><strong>data</strong> – The data for the table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.get_password">
+<span class="sig-name descname"><span class="pre">get_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.get_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.get_password" title="Link to this definition"></a></dt>
+<dd><p>Get a password from the user or generate one if not provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> – The site for which the password is being generated.</p></li>
+<li><p><strong>username</strong> – The username associated with the password.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated or provided password.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.master_validation">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">master_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.master_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.master_validation" title="Link to this definition"></a></dt>
+<dd><p>Validate the master password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>password</strong> – The password to validate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the password is valid, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.get_master_password">
+<span class="sig-name descname"><span class="pre">get_master_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.get_master_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.get_master_password" title="Link to this definition"></a></dt>
+<dd><p>Get the master password from the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> – The message to display to the user.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The master password provided by the user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.get_selection">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.get_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.get_selection" title="Link to this definition"></a></dt>
+<dd><p>Get a selection from the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> – The message to display to the user.</p></li>
+<li><p><strong>choices</strong> – The choices to display to the user.</p></li>
+<li><p><strong>default</strong> – The default choice.</p></li>
+<li><p><strong>skip_message</strong> – The message to display for skipping the selection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The selected choice.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.get_input">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.get_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.get_input" title="Link to this definition"></a></dt>
+<dd><p>Get input from the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> – The message to display to the user.</p></li>
+<li><p><strong>default</strong> – The default input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input provided by the user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.ui_input">
+<span class="sig-name descname"><span class="pre">ui_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'INPUT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'SELECTION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'BOTH'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'PASSWORD'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'MASTER_PASSWORD'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'CONFIRM'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'FILE'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.ui_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.ui_input" title="Link to this definition"></a></dt>
+<dd><p>Get input from the user based on the specified mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> – The mode to use for input.</p></li>
+<li><p><strong>selection_message</strong> – The message for selection mode.</p></li>
+<li><p><strong>choices</strong> – The choices for selection mode.</p></li>
+<li><p><strong>input_message</strong> – The message for input mode.</p></li>
+<li><p><strong>skip_message</strong> – The message for skipping the selection.</p></li>
+<li><p><strong>default</strong> – The default input.</p></li>
+<li><p><strong>site</strong> – The site for password mode.</p></li>
+<li><p><strong>username</strong> – The username for password mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input provided by the user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.wait">
+<span class="sig-name descname"><span class="pre">wait</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.wait"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.wait" title="Link to this definition"></a></dt>
+<dd><p>Wait for the user to press ENTER.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_error">
+<span class="sig-name descname"><span class="pre">show_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_error" title="Link to this definition"></a></dt>
+<dd><p>Display an error message to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> – The error message to display.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_success">
+<span class="sig-name descname"><span class="pre">show_success</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_success"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_success" title="Link to this definition"></a></dt>
+<dd><p>Display a success message to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> – The success message to display.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_info">
+<span class="sig-name descname"><span class="pre">show_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_info" title="Link to this definition"></a></dt>
+<dd><p>Display an informational message to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> – The informational message to display.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_warning">
+<span class="sig-name descname"><span class="pre">show_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_warning" title="Link to this definition"></a></dt>
+<dd><p>Display a warning message to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> – The warning message to display.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_greet_panel">
+<span class="sig-name descname"><span class="pre">show_greet_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_greet_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_greet_panel" title="Link to this definition"></a></dt>
+<dd><p>Display a warning panel to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the panel.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the panel.</p></li>
+<li><p><strong>message</strong> – The warning message to display.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_warning_panel">
+<span class="sig-name descname"><span class="pre">show_warning_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_warning_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_warning_panel" title="Link to this definition"></a></dt>
+<dd><p>Display a warning panel to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the panel.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the panel.</p></li>
+<li><p><strong>message</strong> – The warning message to display.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_error_panel">
+<span class="sig-name descname"><span class="pre">show_error_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_error_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_error_panel" title="Link to this definition"></a></dt>
+<dd><p>Display an error panel to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the panel.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the panel.</p></li>
+<li><p><strong>message</strong> – The error message to display.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_success_panel">
+<span class="sig-name descname"><span class="pre">show_success_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_success_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_success_panel" title="Link to this definition"></a></dt>
+<dd><p>Display a success panel to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the panel.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the panel.</p></li>
+<li><p><strong>message</strong> – The success message to display.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.UserInterface.show_info_panel">
+<span class="sig-name descname"><span class="pre">show_info_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#UserInterface.show_info_panel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.UserInterface.show_info_panel" title="Link to this definition"></a></dt>
+<dd><p>Display an informational panel to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> – The title of the panel.</p></li>
+<li><p><strong>subtitle</strong> – The subtitle of the panel.</p></li>
+<li><p><strong>message</strong> – The informational message to display.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="passwordmanager">
+<h2>PasswordManager<a class="headerlink" href="#passwordmanager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">PasswordManager</span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to manage the Password Manager application.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the PasswordManager object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.__call__" title="Link to this definition"></a></dt>
+<dd><p>Run the Password Manager application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.init_pm">
+<span class="sig-name descname"><span class="pre">init_pm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#pypasscrypt.passcrypt.Storage" title="pypasscrypt.passcrypt.Storage"><span class="pre">Storage</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.init_pm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.init_pm" title="Link to this definition"></a></dt>
+<dd><p>Initialize the Password Manager</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the status and the storage object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.generate_master">
+<span class="sig-name descname"><span class="pre">generate_master</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.generate_master"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.generate_master" title="Link to this definition"></a></dt>
+<dd><p>Generate the master password for the Password Manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The generated master password.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.login">
+<span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#pypasscrypt.passcrypt.Storage" title="pypasscrypt.passcrypt.Storage"><span class="pre">Storage</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.login" title="Link to this definition"></a></dt>
+<dd><p>Login to access the password manager</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the status and the storage object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.main_menu">
+<span class="sig-name descname"><span class="pre">main_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.main_menu" title="Link to this definition"></a></dt>
+<dd><p>Display the main menu of the Password Manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.authenticate" title="Link to this definition"></a></dt>
+<dd><p>Authenticate the user to access the settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.add_password">
+<span class="sig-name descname"><span class="pre">add_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.add_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.add_password" title="Link to this definition"></a></dt>
+<dd><p>Add a password to the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.remove_password">
+<span class="sig-name descname"><span class="pre">remove_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.remove_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.remove_password" title="Link to this definition"></a></dt>
+<dd><p>Remove a password from the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.edit_password">
+<span class="sig-name descname"><span class="pre">edit_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.edit_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.edit_password" title="Link to this definition"></a></dt>
+<dd><p>Edit a password in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.list_all">
+<span class="sig-name descname"><span class="pre">list_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.list_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.list_all" title="Link to this definition"></a></dt>
+<dd><p>List all passwords in the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.settings">
+<span class="sig-name descname"><span class="pre">settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.settings" title="Link to this definition"></a></dt>
+<dd><p>Display the settings menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.clear_logs">
+<span class="sig-name descname"><span class="pre">clear_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.clear_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.clear_logs" title="Link to this definition"></a></dt>
+<dd><p>Clear the logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.remove_pc">
+<span class="sig-name descname"><span class="pre">remove_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.remove_pc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.remove_pc" title="Link to this definition"></a></dt>
+<dd><p>Remove the PassCrypt storage file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.export_logs">
+<span class="sig-name descname"><span class="pre">export_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.export_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.export_logs" title="Link to this definition"></a></dt>
+<dd><p>Export the PassCrypt logs to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.export_pc">
+<span class="sig-name descname"><span class="pre">export_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.export_pc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.export_pc" title="Link to this definition"></a></dt>
+<dd><p>Export the PassCrypt storage to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.import_pc">
+<span class="sig-name descname"><span class="pre">import_pc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.import_pc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.import_pc" title="Link to this definition"></a></dt>
+<dd><p>Import a PassCrypt storage from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.clear_all_data">
+<span class="sig-name descname"><span class="pre">clear_all_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.clear_all_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.clear_all_data" title="Link to this definition"></a></dt>
+<dd><p>Clear all passwords from the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PasswordManager.change_master_password">
+<span class="sig-name descname"><span class="pre">change_master_password</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#PasswordManager.change_master_password"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pypasscrypt.passcrypt.PasswordManager.change_master_password" title="Link to this definition"></a></dt>
+<dd><p>Change the master password for the storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.SIMILAR_CHARS">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">SIMILAR_CHARS</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.SIMILAR_CHARS" title="Link to this definition"></a></dt>
+<dd><p>Dictionary of characters that are visually similar and can be easily confused.</p>
+<p>Key-value pairs where the key is a character and the value is a string
+of characters that look similar to the key.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.CONTEXT_FILTER">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">CONTEXT_FILTER</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.CONTEXT_FILTER" title="Link to this definition"></a></dt>
+<dd><p>List of context filters to exclude from password generation.</p>
+<p>Contains strings that are commonly used in passwords and should be avoided
+to ensure the generated passwords are secure.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.APPLICATION_NAME">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">APPLICATION_NAME</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.APPLICATION_NAME" title="Link to this definition"></a></dt>
+<dd><p>The name of the application.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.LOCATION">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">LOCATION</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.LOCATION" title="Link to this definition"></a></dt>
+<dd><p>The location to store the application data.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.DIRECTORY">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">DIRECTORY</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.DIRECTORY" title="Link to this definition"></a></dt>
+<dd><p>The directory to store the application data.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.FILENAME">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">FILENAME</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.FILENAME" title="Link to this definition"></a></dt>
+<dd><p>The name of the storage file.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.EXTENSION">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">EXTENSION</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.EXTENSION" title="Link to this definition"></a></dt>
+<dd><p>The extension of the storage file.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.DOWNLOADS">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">DOWNLOADS</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.DOWNLOADS" title="Link to this definition"></a></dt>
+<dd><p>The default downloads directory.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.EXPORT_DIRECTORY">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">EXPORT_DIRECTORY</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.EXPORT_DIRECTORY" title="Link to this definition"></a></dt>
+<dd><p>The directory to store exported data.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pypasscrypt.passcrypt.PATHS">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">PATHS</span></span><a class="headerlink" href="#pypasscrypt.passcrypt.PATHS" title="Link to this definition"></a></dt>
+<dd><p>Dictionary of paths used by the application.</p>
+<p>Contains key-value pairs where the key is a description of the path
+and the value is the actual path used by the application.</p>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pypasscrypt.passcrypt.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypasscrypt/passcrypt.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Run the Password Manager application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tejus Gupta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
