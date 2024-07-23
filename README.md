@@ -1,7 +1,5 @@
 # PassCrypt
 
-![PassCrypt Logo](https://link-to-your-logo-image)
-
 **PassCrypt** is a comprehensive command-line tool designed to securely store, manage, and access your passwords. Built with Python, PassCrypt leverages advanced encryption techniques to ensure your data remains safe and private.
 
 ## Table of Contents
