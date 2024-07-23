@@ -6,29 +6,63 @@ encryption, and storage.
 """
 
 # Utility classes
-from pypasscrypt.passcrypt import UserInterface, Storage, CryptoHandler, PasswordGenerator, PasswordManager
+from pypasscrypt.passcrypt import (
+    UserInterface,  # User Interface class for command line interface.
+    Storage,  # Storage class for managing storage of passwords.
+    CryptoHandler,  # CryptoHandler class for encryption and decryption.
+    PasswordGenerator,  # PasswordGenerator class for generating passwords.
+    PasswordManager  # PasswordManager class for managing passwords.
+)
 
 # Password Generation
-from pypasscrypt.passcrypt import SIMILAR_CHARS, CONTEXT_FILTER
+from pypasscrypt.passcrypt import (
+    SIMILAR_CHARS,  # Similar characters to avoid in password generation.
+    CONTEXT_FILTER  # Context filter for password generation.
+)
 
 # Constants
 from pypasscrypt.passcrypt import (
-    EXTENSION, EXPORT_DIRECTORY, APPLICATION_NAME,
-    DIRECTORY, FILENAME, DOWNLOADS, PATHS
+    EXTENSION,  # File extension for storage files.
+    EXPORT_DIRECTORY,  # Export directory for storage files.
+    APPLICATION_NAME,  # Application name for storage files.
+    DIRECTORY,  # Directory for storage files.
+    FILENAME,  # Filename for storage files.
+    DOWNLOADS,  # Downloads directory for storage files.
+    PATHS  # Paths for storage files.
 )
 
 # Public API
 __all__ = [
-    'UserInterface', 'Storage', 'CryptoHandler', 'PasswordGenerator', 'PasswordManager',
-    'SIMILAR_CHARS', 'CONTEXT_FILTER', 'EXTENSION', 'EXPORT_DIRECTORY',
-    'APPLICATION_NAME', 'DIRECTORY', 'FILENAME', 'DOWNLOADS', 'PATHS',
-    '__version__', '__author__', '__email__', '__license__', '__url__',
-    '__description__', '__name__', '__package__', '__title__', '__summary__', 
-    '__keywords__', '__classifiers__'
+    'UserInterface',
+    'Storage',
+    'CryptoHandler',
+    'PasswordGenerator',
+    'PasswordManager',
+    'SIMILAR_CHARS',
+    'CONTEXT_FILTER',
+    'EXTENSION',
+    'EXPORT_DIRECTORY',
+    'APPLICATION_NAME',
+    'DIRECTORY',
+    'FILENAME',
+    'DOWNLOADS',
+    'PATHS',
+    '__version__',
+    '__author__',
+    '__email__',
+    '__license__',
+    '__url__',
+    '__description__',
+    '__name__',
+    '__package__',
+    '__title__',
+    '__summary__',
+    '__keywords__',
+    '__classifiers__'
 ]
 
 # Metadata
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __author__ = "Tejus Gupta"
 __email__ = "tejus3131@gmail.com"
 __license__ = "MIT"
@@ -59,3 +93,4 @@ __classifiers__ = [
 
 # Ensure no duplicates in __all__
 __all__ = list(set(__all__))
+print(__all__)

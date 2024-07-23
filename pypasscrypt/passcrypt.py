@@ -509,7 +509,8 @@ class Storage:
             f"passcrypt_storage_{str(CryptoHandler.hash(str(datetime.now())))}.{EXTENSION}"
         )
 
-        os.makedirs(PATHS["EXPORT_PATH"], exist_ok=True)
+        if not os.path.exists(PATHS["EXPORT_PATH"]):
+            os.makedirs(PATHS["EXPORT_PATH"], exist_ok=True)
 
         with open(file_path, "+wb") as EXPORT_PATH:
             encrypted_data = CryptoHandler.encrypt(
@@ -530,6 +531,10 @@ class Storage:
             PATHS["EXPORT_PATH"],
             f"passcrypt_logs_{str(CryptoHandler.hash(str(datetime.now())))}.log"
         )
+
+        if not os.path.exists(PATHS["EXPORT_PATH"]):
+            os.makedirs(PATHS["EXPORT_PATH"], exist_ok=True)
+
         with open(file_path, "w") as export_file:
             with open(PATHS["LOG_FILE"], "r") as log_file:
                 export_file.write(log_file.read())
@@ -1305,7 +1310,8 @@ class PasswordManager:
             self.storage.remove_password(site, username)
             self.ui.show_success(
                 f"Password for {site} - {username} removed successfully!")
-            logging.info(f"Password for {site} - {username} removed successfully!")
+            logging.info(
+                f"Password for {site} - {username} removed successfully!")
         else:
             self.ui.show_info(
                 f"Returning to the Main Menu.")

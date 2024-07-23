@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pypasscrypt"
-version = "1.0.0"
+version = "1.0.1"
 description = "a module for testing new python features"
 authors = ["tejus3131 <tejus3131@gmail.com>"]
 license = "None"
