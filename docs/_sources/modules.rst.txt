@@ -1,7 +1,0 @@
-FuckIT
-======
-
-.. toctree::
-   :maxdepth: 4
-
-   pypasscrypt

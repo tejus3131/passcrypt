@@ -1108,7 +1108,7 @@
 
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span><span class="s2">&quot;Press ENTER to continue.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Press ENTER to continue.&quot;</span><span class="p">)</span>
         <span class="nb">input</span><span class="p">()</span></div>
 
 
@@ -1307,14 +1307,19 @@
 
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting PassCrypt Application&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">PATHS</span><span class="p">[</span><span class="s2">&quot;STORAGE_FILE&quot;</span><span class="p">]):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initializing PassCrypt&quot;</span><span class="p">)</span>
             <span class="n">status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_pm</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logging into PassCrypt&quot;</span><span class="p">)</span>
             <span class="n">status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Access granted!&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">main_menu</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Access denied!&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while initializing the Password Manager&quot;</span><span class="p">)</span></div>
 
@@ -1506,7 +1511,8 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> added successfully!&quot;</span><span class="p">)</span>
-        <span class="n">pyperclip</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_password_for_site</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">))</span></div>
+        <span class="n">pyperclip</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_password_for_site</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> added successfully!&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PasswordManager.remove_password">
@@ -1552,6 +1558,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">remove_password</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> removed successfully!&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> removed successfully!&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Returning to the Main Menu.&quot;</span><span class="p">)</span></div>
@@ -1654,6 +1661,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">edit_password</span><span class="p">(</span>
             <span class="n">previous_site</span><span class="p">,</span> <span class="n">previous_user</span><span class="p">,</span> <span class="n">new_site</span><span class="p">,</span> <span class="n">new_user</span><span class="p">,</span> <span class="n">new_password</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">previous_site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">previous_user</span><span class="si">}</span><span class="s2"> edited successfully!&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">previous_site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">previous_user</span><span class="si">}</span><span class="s2"> edited successfully!&quot;</span><span class="p">)</span></div>
 
 
@@ -1668,6 +1677,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;List All Passwords&quot;</span><span class="p">,</span>
@@ -1707,6 +1717,8 @@
             <span class="n">pyperclip</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_password_for_site</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">username</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> copied to clipboard!</span><span class="se">\n</span><span class="s2">Returning to the Main Menu.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Password for </span><span class="si">{</span><span class="n">site</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> copied to clipboard!&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span>
                 <span class="s2">&quot;Returning to the Main Menu.&quot;</span><span class="p">)</span></div>
@@ -1759,6 +1771,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Clear Logs&quot;</span><span class="p">,</span> <span class="s2">&quot;Press ctrl+c to abort.&quot;</span><span class="p">)</span>
@@ -1769,6 +1782,7 @@
         <span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">clear_logs</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;Logs cleared successfully!&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Logs cleared successfully!&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span><span class="s2">&quot;Returning to the Main Menu.&quot;</span><span class="p">)</span></div>
 
@@ -1795,6 +1809,7 @@
         <span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">PATHS</span><span class="p">[</span><span class="s2">&quot;STORAGE_FILE&quot;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;PassCrypt storage removed successfully!&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PassCrypt storage removed successfully!&quot;</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span> <span class="k">else</span> <span class="s1">&#39;clear&#39;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1812,6 +1827,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Export PassCrypt Logs&quot;</span><span class="p">,</span> <span class="s2">&quot;Press ctrl+c to abort.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_info_panel</span><span class="p">(</span>
@@ -1830,6 +1846,7 @@
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">export_logs</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;PassCrypt logs exported successfully!</span><span class="se">\n</span><span class="s2">File saved at: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">Returning to the Main Menu.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PassCrypt logs exported successfully!&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 
@@ -1845,6 +1862,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Export PassCrypt Storage&quot;</span><span class="p">,</span>
@@ -1870,6 +1888,7 @@
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">export_storage</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;PassCrypt storage exported successfully!</span><span class="se">\n</span><span class="s2">File saved at: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">Returning to the Main Menu.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PassCrypt storage exported successfully to: &quot;</span> <span class="o">+</span> <span class="n">path</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 
@@ -1885,6 +1904,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Import PassCrypt Storage&quot;</span><span class="p">,</span>
                          <span class="s2">&quot;Press ctrl+c to abort.&quot;</span><span class="p">)</span>
@@ -1905,7 +1925,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">import_storage</span><span class="p">(</span><span class="n">final_password</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">ui_input</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span>
             <span class="s2">&quot;PassCrypt storage imported successfully!</span><span class="se">\n</span><span class="s2">Returning to the Main Menu.&quot;</span><span class="p">)</span>
-
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PassCrypt storage imported successfully!&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 
 
@@ -1920,6 +1940,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Clear All Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Press ctrl+c to abort.&quot;</span><span class="p">)</span>
@@ -1936,7 +1957,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_info</span><span class="p">(</span><span class="s2">&quot;Returning to the Main Menu.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">clear_all_data</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;All passwords cleared successfully!&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;All passwords cleared successfully!&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All passwords cleared successfully!&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PasswordManager.change_master_password">
@@ -1950,6 +1972,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_error</span><span class="p">(</span>
                 <span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while accessing the storage.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;Reset Master Password&quot;</span><span class="p">,</span>
                          <span class="s2">&quot;Press ctrl+c to abort.&quot;</span><span class="p">)</span>
@@ -1961,7 +1984,8 @@
 
         <span class="n">new_password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_master</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">change_master_password</span><span class="p">(</span><span class="n">new_password</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;Master Password reset successfully!&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">show_success</span><span class="p">(</span><span class="s2">&quot;Master Password reset successfully!&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Master Password reset successfully!&quot;</span><span class="p">)</span></div>
 </div>
 
 
@@ -1979,9 +2003,13 @@
         <span class="n">passcrypt</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Exiting PassCrypt...&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Exiting PassCrypt&quot;</span><span class="p">)</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;cls&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span> <span class="k">else</span> <span class="s1">&#39;clear&#39;</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;An error occurred while running PassCrypt.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
 
 
 
