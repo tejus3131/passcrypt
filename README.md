@@ -96,7 +96,7 @@ On first run, you'll be prompted to set up a master password. This password will
 ## Download CLI Tool
 
 For convenience, you can also download the PassCrypt CLI tool directly from the following link:
-[PassCrypt CLI Tool](https://github.com/tejus3131/passcrypt/releases/download/version_1.0.0/passcrypt.exe)
+[PassCrypt CLI Tool](https://github.com/tejus3131/passcrypt/releases/download/version_1.0.1/passcrypt.exe)
 
 ## Development
 
