@@ -1,48 +1,17 @@
-"""
-pypasscrypt.config
-------------------
-
-A class for the PassCrypt configuration.
-
-Model classes:
-----------------
-- `ImmutableConfig`: A class for immutable configuration.
-- `MutableConfig`: A class for mutable configuration.
-- `BaseConfig`: A class for base configuration.
-
-Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-"""
-
-# Metadata
-__version__ = '2.0.0'
-__author__ = 'Tejus Gupta'
-__email__ = 'tejus3131@gmail.com'
-__license__ = 'MIT'
-__copyright__ = '2024, Tejus Gupta'
-__status__ = 'Development'
-
-# Public API
-__all__ = [
-    'BaseConfig',
-    '__version__',
-    '__author__',
-    '__email__',
-    '__license__',
-    '__status__'
-]
-
+from datetime import datetime
 import os
 import json
 from pathlib import Path
 from pydantic import (
     BaseModel,
-    Field,
-    ValidationError
+    Field
 )
 from typing import (
+    Any,
     Dict,
     List,
     Literal,
+    Optional,
     Union,
     get_args
 )
@@ -50,123 +19,53 @@ from socket import (
     gethostbyname,
     gethostname
 )
+from pypasscrypt import (
+    AsymmetricEncryptionTypes,
+    HashHandler,
+    InvalidAsymmetricEncryptionTypeError,
+    HashTypes,
+    InvalidHashTypeError,
+    SymmetricEncryptionTypes,
+    InvalidSymmetricEncryptionTypeError,
+    EPC
+)
+from logging import (
+    Logger,
+    getLogger,
+    FileHandler,
+    Formatter,
+    INFO
+)
+
+from pypasscrypt.connectionhandler import ConnectionProtocolTypes, InvalidConnectionProtocolError
+from pypasscrypt.passwordhandler import PasswordManagerTypes, InvalidPasswordManagerTypeError
 
 
-class ImmutableConfig(BaseModel):
-    """
-    pypasscrypt.config.ImmutableConfig
-    ---------------------------------
-
-    A class for immutable configuration.
-
-    Attributes:
-    ----------------
-    - `IP`: str: The IP address of the host.
-    - `STORAGE_DIRECTORY`: str: The directory for storage files.
-    - `STORAGE_FILE_NAME`: str: The filename for storage files.
-    - `STORAGE_EXTENSION`: str: The file extension for storage files.
-    - `EXPORT_DIRECTORY`: str: The directory for export files.
-    - `EXPORT_FILE_NAME`: str: The filename for export files.
-    - `APPLICATION_NAME`: str: The application name.
-    - `LOG_STRUCTURE`: str: The log structure.
-    - `LOG_LEVEL`: str: The log level.
-    - `SIMILAR_CHARACTERS`: Dict[str, str]: The similar character's dictionary.
-    - `CONTEXT_FILTERS`: List[str]: The context filters list.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+class ApplicationDetails(BaseModel):
 
     APPLICATION_NAME: str = "PassCrypt"
-    """
-    pypasscrypt.config.ImmutableConfig.APPLICATION_NAME
-    --------------------------------------------------
 
-    The application name.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    STORAGE_DIRECTORY: str = Field(
+        default_factory=lambda: os.path.join(os.getenv("PROGRAMDATA", "")))
 
-    STORAGE_DIRECTORY: str = Field(default_factory=lambda: os.path.join(
-        os.getenv("PROGRAMDATA", ""), "passcrypt"))
-    """
-    pypasscrypt.config.ImmutableConfig.STORAGE_DIRECTORY
-    ---------------------------------------------------
+    EXPORT_DIRECTORY: str = Field(
+        default_factory=lambda: os.path.join(Path.home(), "Downloads"))
 
-    The directory for storage files.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    CONFIG_FILE_EXTENSION: str = "json"
 
-    STORAGE_FILE_NAME: str = Field(default_factory=lambda: "passcrypt_storage")
-    """
-    pypasscrypt.config.ImmutableConfig.STORAGE_FILE_NAME
-    ---------------------------------------------------
+    STORAGE_FILE_EXTENSION: str = "epc"
 
-    The filename for storage files.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    EXPORT_FILE_EXTENSION: str = "ept"
 
-    STORAGE_EXTENSION: str = "epc"
-    """
-    pypasscrypt.config.ImmutableConfig.STORAGE_EXTENSION
-    ---------------------------------------------------
-
-    The file extension for storage files.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
-
-    EXPORT_DIRECTORY: str = Field(default_factory=lambda: os.path.join(
-        Path.home(), "Downloads", "passcrypt_exports"))
-    """
-    pypasscrypt.config.ImmutableConfig.EXPORT_DIRECTORY
-    ---------------------------------------------------
-
-    The directory for export files.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
-
-    EXPORT_FILE_NAME: str = Field(default_factory=lambda: "passcrypt_export")
-    """
-    pypasscrypt.config.ImmutableConfig.EXPORT_FILE_NAME
-    ---------------------------------------------------
-
-    The filename for export files.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    LOG_FILE_EXTENSION: str = "log"
 
     LOG_STRUCTURE: str = "%(asctime)s - %(levelname)s - %(message)s"
-    """
-    pypasscrypt.config.ImmutableConfig.LOG_STRUCTURE
-    ------------------------------------------------
 
-    The log structure.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
-
-    LOG_LEVEL: int = 20
-    """
-    pypasscrypt.config.ImmutableConfig.LOG_LEVEL
-    --------------------------------------------
-
-    The log level.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    LOG_LEVEL: int = INFO
 
     IP: str = Field(default_factory=lambda: gethostbyname(gethostname()))
-    """
-    pypasscrypt.config.ImmutableConfig.IP
-    --------------------------------
 
-    The IP address of the host.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    CONFIG_VERSION: str = "CONFIGv1.0"
 
     SIMILAR_CHARACTERS: Dict[str, str] = {
         "o": "0",
@@ -194,14 +93,6 @@ class ImmutableConfig(BaseModel):
         "6": "G",
         "g": "9"
     }
-    """
-    pypasscrypt.config.ImmutableConfig.SIMILAR_CHARACTERS
-    ---------------------------------------------------
-
-    The similar characters dictionary.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     CONTEXT_FILTERS: List[str] = [
         "gmail",
@@ -275,255 +166,307 @@ class ImmutableConfig(BaseModel):
         "trial",
         "trial123"
     ]
-    """
-    pypasscrypt.config.ImmutableConfig.CONTEXT_FILTERS
-    --------------------------------------------------
 
-    The context filters list.
-    
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    def get(
+            self,
+            *,
+            key: Literal[
+                "APPLICATION_NAME",
+                "CONFIG_FILE_NAME",
+                "STORAGE_FILE_NAME",
+                "EXPORT_FILE_NAME",
+                "EXPORT_CONFIG_FILE_NAME",
+                "LOG_FILE_NAME",
+                "LOG_STRUCTURE",
+                "LOG_LEVEL",
+                "IP",
+                "SIMILAR_CHARACTERS",
+                "CONTEXT_FILTERS"
+            ],
+            userhash: Optional[str] = None
+    ) -> Union[str, int, Dict[str, str], List[str]]:
+
+        if not isinstance(key, str):
+            raise TypeError("Key must be of type 'str'.")
+
+        if key in ['APPLICATION_NAME', 'LOG_STRUCTURE', 'LOG_LEVEL', 'IP', 'SIMILAR_CHARACTERS', 'CONTEXT_FILTERS']:
+            return getattr(self, key)
+
+        if key == "CONFIG_FILE_NAME":
+            return os.path.join(
+                self.STORAGE_DIRECTORY,
+                self.APPLICATION_NAME,
+                f"{self.APPLICATION_NAME}.{self.CONFIG_FILE_EXTENSION}"
+            )
+
+        if not isinstance(userhash, str):
+            raise TypeError("Userhash must be of type 'str'.")
+        
+        if not userhash:
+            raise ValueError(f"userhash is required for: {key}")
+
+        if key == "STORAGE_FILE_NAME":
+            return os.path.join(
+                self.STORAGE_DIRECTORY,
+                self.APPLICATION_NAME,
+                f"{self.APPLICATION_NAME.lower()}_storage_file_{userhash}.{self.STORAGE_FILE_EXTENSION}"
+            )
+
+        elif key == "EXPORT_FILE_NAME":
+            return os.path.join(
+                self.EXPORT_DIRECTORY,
+                self.APPLICATION_NAME,
+                f"{self.APPLICATION_NAME.lower()}_export_file_{userhash}.{self.EXPORT_FILE_EXTENSION}"
+            )
+
+        elif key == "LOG_FILE_NAME":
+            return os.path.join(
+                self.STORAGE_DIRECTORY,
+                self.APPLICATION_NAME,
+                f"{self.APPLICATION_NAME.lower()}_log_file_{userhash}.{self.LOG_FILE_EXTENSION}"
+            )
+        
+        elif key == "EXPORT_CONFIG_FILE_NAME":
+            return os.path.join(
+                self.EXPORT_DIRECTORY,
+                self.APPLICATION_NAME,
+                f"{self.APPLICATION_NAME.lower()}_export_config_file_{userhash}.{self.CONFIG_FILE_EXTENSION}"
+            )
+
+        else:
+            raise ValueError(f"Field '{key}' not found in the configuration.")
 
     class Config:
         frozen = True
 
 
-class MutableConfig(BaseModel):
-    """
-    pypasscrypt.config.MutableConfig
-    --------------------------------
+class UserDetails(BaseModel):
 
-    A class for mutable configuration.
+    USERHASH: str = Field(default_factory=lambda: HashHandler.generate_hash(
+        data=datetime.now().isoformat(),
+        method="SHA256"
+    ))
 
-    Attributes:
-    ------------
-    - `DEFAULT_PORT`: int: The default port.
-    - `ASYMMETRIC_ENCRYPTION_TYPE`: AsymmetricEncryptionMethod: The asymmetric encryption type.
-    - `SYMMETRIC_ENCRYPTION_TYPE`: SymmetricEncryptionMethod: The symmetric encryption type.
-    - `PASSWORD_LENGTH`: int: The password length.
-    - `UPPER_CASE_ALLOWED`: bool: The upper case allowed flag.
-    - `LOWER_CASE_ALLOWED`: bool: The lower case allowed flag.
-    - `DIGITS_ALLOWED`: bool: The digits allowed flag.
-    - `SYMBOLS_ALLOWED`: bool: The symbols allowed flag.
-    - `SIMILAR_CHARACTERS_ALLOWED`: bool: The similar characters allowed flag.
+    DEFAULT_PORT: int = Field(default=12345, ge=0, le=65535)
 
-    Methods:
-    --------
-    - `load()`: Load the configuration from a file.
-    - `save()`: Save the configuration to a file.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
-
-    DEFAULT_PORT: int = 12345
-    """
-    pyppasscrypt.config.MutableConfig.DEFAULT_PORT
-    -------------------------------------------
-
-    The default port.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    CONNECTION_PROTOCOL: ConnectionProtocolTypes = "PassCryptConnectionProtocolHandler"
 
     ASYMMETRIC_ENCRYPTION_TYPE: AsymmetricEncryptionTypes = "RSA"
-    """
-    pyppasscrypt.config.MutableConfig.ASYMMETRIC_ENCRYPTION_TYPE
-    -----------------------------------------------------------
-
-    The asymmetric encryption type.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     SYMMETRIC_ENCRYPTION_TYPE: SymmetricEncryptionTypes = "AES"
-    """
-    pyppasscrypt.config.MutableConfig.SYMMETRIC_ENCRYPTION_TYPE
-    ----------------------------------------------------------
 
-    The symmetric encryption type.
+    HASH_TYPE: HashTypes = "SHA256"
 
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    PASSWORD_MANAGER_TYPE: PasswordManagerTypes = "PassCryptPasswordManager"
 
-    PASSWORD_LENGTH: int = 16
-    """
-    pyppasscrypt.config.MutableConfig.PASSWORD_LENGTH
-    ------------------------------------------------
-    
-    The password length.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+    PASSWORD_LENGTH: int = Field(default=16, ge=0)
 
     UPPER_CASE_ALLOWED: bool = True
-    """
-    pyppasscrypt.config.MutableConfig.UPPER_CASE_ALLOWED
-    ---------------------------------------------------
-
-    The upper case allowed flag.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     LOWER_CASE_ALLOWED: bool = True
-    """
-    pyppasscrypt.config.MutableConfig.LOWER_CASE_ALLOWED
-    ---------------------------------------------------
-
-    The lower case allowed flag.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     DIGITS_ALLOWED: bool = True
-    """
-    pyppasscrypt.config.MutableConfig.DIGITS_ALLOWED
-    ----------------------------------------------
-
-    The digits allowed flag.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     SYMBOLS_ALLOWED: bool = True
-    """
-    pyppasscrypt.config.MutableConfig.SYMBOLS_ALLOWED
-    -----------------------------------------------
-
-    The symbols allowed flag.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     SIMILAR_CHARACTERS_ALLOWED: bool = True
-    """
-    pyppasscrypt.config.MutableConfig.SIMILAR_CHARACTERS_ALLOWED
-    -----------------------------------------------------------
-
-    The similar characters allowed flag.
-
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
 
     class Config:
         frozen = False
 
-    def load(self, file_path: str) -> "MutableConfig":
-        """
-        pypasscrypt.config.MutableConfig.load
-        -------------------------------------
 
-        Load the configuration from a file.
+class UserConfig(BaseModel):
+    APPLICATION_NAME: str
+    STORAGE_FILE_NAME: str
+    EXPORT_FILE_NAME: str
+    IP: str
+    CONNECTION_PROTOCOL: ConnectionProtocolTypes
+    SIMILAR_CHARACTERS: Dict[str, str]
+    CONTEXT_FILTERS: List[str]
+    DEFAULT_PORT: int
+    ASYMMETRIC_ENCRYPTION_TYPE: AsymmetricEncryptionTypes
+    SYMMETRIC_ENCRYPTION_TYPE: SymmetricEncryptionTypes
+    HASH_TYPE: HashTypes
+    PASSWORD_MANAGER_TYPE: PasswordManagerTypes
+    PASSWORD_LENGTH: int
+    UPPER_CASE_ALLOWED: bool
+    LOWER_CASE_ALLOWED: bool
+    DIGITS_ALLOWED: bool
+    SYMBOLS_ALLOWED: bool
+    SIMILAR_CHARACTERS_ALLOWED: bool
+    IMPORT_FILE_PATH: str
+    IMPORT_FILE_EXTENSION: str
+    CONFIG_FILE_EXTENSION: str
 
-        :param file_path: str: The file path.
-        :return: MutableConfig: The mutable configuration
 
-        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-        """
+class Config(BaseModel):
+
+    application_details: ApplicationDetails = ApplicationDetails()
+    users: Dict[str, UserDetails] = {}
+
+    def load(self) -> None:
+        file_path: Union[str, int, Dict[str, str], List[str]
+                         ] = self.application_details.get(key="CONFIG_FILE_NAME")
+
+        if not isinstance(file_path, str):
+            raise TypeError("file_path must be string.")
+
         try:
-            with open(file_path, 'r') as file:
-                data = json.load(file)
-            return self.model_validate(data)
-        except (FileNotFoundError, ValidationError, json.JSONDecodeError):
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            self.save(file_path)
-            return self
+            with open(file_path, "r") as file:
+                data: Dict[str, dict] = json.load(file)
+            for key in data:
+                self.users[key] = UserDetails(**data[key])
+        except FileNotFoundError:
+            self.save()
 
-    def save(self, file_path: str) -> None:
-        """
-        pypasscrypt.config.MutableConfig.save
-        -------------------------------------
+    def save(self) -> None:
+        file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(key="CONFIG_FILE_NAME")
 
-        Save the configuration to a file.
+        if not isinstance(file_path, str):
+            raise TypeError("file_path must be string.")
 
-        :param file_path: str: The file path.
-        :return: None
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
 
-        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-        """
-        data = self.model_dump()
-        with open(file_path, 'w') as file:
+        data: Dict[str, Dict[str, Union[str, bool, int]]] = {}
+
+        for key in self.users:
+            data[key] = self.users[key].model_dump()
+
+        with open(file_path, "w+") as file:
             json.dump(data, file, indent=4)
 
+    def change_username(self, *, old_username: str, new_username: str) -> None:
+        if not isinstance(old_username, str):
+            raise TypeError("Old username must be of type 'str'.")
 
-class BaseConfig(BaseModel):
-    """
-    pypasscrypt.config.BaseConfig
-    ------------------------------
+        if not isinstance(new_username, str):
+            raise TypeError("New username must be of type 'str'.")
 
-    A class for base configuration.
+        self.load()
 
-    Attributes:
-    ------------
-    - `base_file_path`: str: The base file path.
-    - `immutable`: ImmutableConfig: The immutable configuration.
-    - `mutable`: MutableConfig: The mutable configuration.
+        if old_username not in self.users:
+            raise ValueError(
+                f"User '{old_username}' not found in the configuration.")
 
-    Methods:
-    --------
-    - `set()`: Set the configuration field.
-    - `get()`: Get the configuration field.
+        if new_username in self.users:
+            raise ValueError(
+                f"User '{new_username}' already exists in the configuration.")
 
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+        self.users[new_username] = self.users.pop(old_username)
+        self.save()
 
-    base_file_path: str
-    """
-    pypasscrypt.config.BaseConfig.base_file_path
-    -------------------------------------------
+    def create(self, *, username: str, secret: str) -> None:
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
+        
+        if not isinstance(secret, str):
+            raise TypeError("Secret must be of type 'str'.")
+        
+        self.load()
 
-    The base file path.
+        if username in self.users:
+            raise ValueError(
+                f"User '{username}' already exists in the configuration.")
 
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+        self.users[username] = UserDetails()
 
-    immutable: ImmutableConfig = ImmutableConfig()
-    """
-    pypasscrypt.config.BaseConfig.immutable
-    --------------------------------------
+        storage_file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
 
-    The immutable configuration.
+        if not isinstance(storage_file_path, str):
+            raise TypeError("storage_file_path must be string.")
 
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+        log_file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_FILE_NAME", userhash=self.users[username].USERHASH)
 
-    mutable: MutableConfig = MutableConfig()
-    """
-    pypasscrypt.config.BaseConfig.mutable
-    ------------------------------------
+        if not isinstance(log_file_path, str):
+            raise TypeError("log_file_path must be string.")
 
-    The mutable configuration.
+        EPC.create(
+            secret=secret,
+            symmetric_encryption_type=self.users[username].SYMMETRIC_ENCRYPTION_TYPE,
+            hash_type=self.users[username].HASH_TYPE,
+            file_path=storage_file_path
+        )
 
-    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-    """
+        with open(log_file_path, "w+") as file:
+            file.write(f"File created at {datetime.now().isoformat()}.")
 
-    def set(self, *, key: Literal[
-        "DEFAULT_PORT",
-        "ASYMMETRIC_ENCRYPTION_TYPE",
-        "SYMMETRIC_ENCRYPTION_TYPE",
-        "PASSWORD_LENGTH",
-        "UPPER_CASE_ALLOWED",
-        "LOWER_CASE_ALLOWED",
-        "DIGITS_ALLOWED",
-        "SYMBOLS_ALLOWED",
-        "SIMILAR_CHARACTERS_ALLOWED"
-    ], value: Union[int, AsymmetricEncryptionTypes, SymmetricEncryptionTypes, bool]) -> None:
-        """
-        pypasscrypt.config.BaseConfig.set
-        ---------------------------------
+        self.save()
 
-        Set the configuration field.
+    def read(
+            self,
+            *,
+            username: str
+    ) -> UserConfig:
 
-        :param key: The key.
-        :param value: The new value.
-        :return: None
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
 
-        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-        """
+        self.load()
 
+        if username not in self.users:
+            raise ValueError(
+                f"User '{username}' not found in the configuration.")
+        
+        storage_file_name = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
+        
+        export_file_name = self.application_details.get(
+            key="EXPORT_FILE_NAME", userhash=self.users[username].USERHASH)
+        
+        
+        return UserConfig(
+            APPLICATION_NAME=self.application_details.APPLICATION_NAME,
+            STORAGE_FILE_NAME=storage_file_name if isinstance(storage_file_name, str) else "",
+            EXPORT_FILE_NAME=export_file_name if isinstance(export_file_name, str) else "",
+            IP=self.application_details.IP,
+            CONNECTION_PROTOCOL=self.users[username].CONNECTION_PROTOCOL,
+            SIMILAR_CHARACTERS=self.application_details.SIMILAR_CHARACTERS,
+            CONTEXT_FILTERS=self.application_details.CONTEXT_FILTERS,
+            DEFAULT_PORT=self.users[username].DEFAULT_PORT,
+            ASYMMETRIC_ENCRYPTION_TYPE=self.users[username].ASYMMETRIC_ENCRYPTION_TYPE,
+            SYMMETRIC_ENCRYPTION_TYPE=self.users[username].SYMMETRIC_ENCRYPTION_TYPE,
+            HASH_TYPE=self.users[username].HASH_TYPE,
+            PASSWORD_MANAGER_TYPE=self.users[username].PASSWORD_MANAGER_TYPE,
+            PASSWORD_LENGTH=self.users[username].PASSWORD_LENGTH,
+            UPPER_CASE_ALLOWED=self.users[username].UPPER_CASE_ALLOWED,
+            LOWER_CASE_ALLOWED=self.users[username].LOWER_CASE_ALLOWED,
+            DIGITS_ALLOWED=self.users[username].DIGITS_ALLOWED,
+            SYMBOLS_ALLOWED=self.users[username].SYMBOLS_ALLOWED,
+            SIMILAR_CHARACTERS_ALLOWED=self.users[username].SIMILAR_CHARACTERS_ALLOWED,
+            IMPORT_FILE_PATH=self.application_details.EXPORT_DIRECTORY,
+            IMPORT_FILE_EXTENSION=self.application_details.EXPORT_FILE_EXTENSION,
+            CONFIG_FILE_EXTENSION=self.application_details.CONFIG_FILE_EXTENSION
+        )
+
+    def update(
+            self,
+            *,
+            key: Literal[
+                "DEFAULT_PORT",  # connection
+                "CONNECTION_PROTOCOL",  # connection
+                "ASYMMETRIC_ENCRYPTION_TYPE",  # cryptography
+                "SYMMETRIC_ENCRYPTION_TYPE",  # cryptography
+                "HASH_TYPE",  # cryptography
+                "PASSWORD_MANAGER_TYPE",  # password
+                "PASSWORD_LENGTH",  # password
+                "UPPER_CASE_ALLOWED",  # password
+                "LOWER_CASE_ALLOWED",  # password
+                "DIGITS_ALLOWED",  # password
+                "SYMBOLS_ALLOWED",  # password
+                "SIMILAR_CHARACTERS_ALLOWED"  # password
+            ],
+            value: Any,
+            username: str
+    ) -> None:
         integer_type = ["DEFAULT_PORT", "PASSWORD_LENGTH"]
         asymmetric_encryption_type = ["ASYMMETRIC_ENCRYPTION_TYPE"]
         symmetric_encryption_type = ["SYMMETRIC_ENCRYPTION_TYPE"]
+        connection_protocol_type = ["CONNECTION_PROTOCOL"]
+        password_manager_type = ["PASSWORD_MANAGER_TYPE"]
+        hash_type = ["HASH_TYPE"]
         boolean_type = [
             "UPPER_CASE_ALLOWED",
             "LOWER_CASE_ALLOWED",
@@ -532,77 +475,240 @@ class BaseConfig(BaseModel):
             "SIMILAR_CHARACTERS_ALLOWED"
         ]
 
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
+
+        if username not in self.users:
+            raise ValueError(
+                f"User '{username}' not found in the configuration.")
+
         if key in integer_type:
             if not isinstance(value, int):
-                raise ValueError(f"Value for {key} must be of type 'int'.")
+                raise TypeError(f"Value for {key} must be of type 'int'.")
 
         elif key in asymmetric_encryption_type:
             if value not in get_args(AsymmetricEncryptionTypes):
-                raise ValueError(
-                    f"Value for {key} must be of type 'AsymmetricEncryptionTypes'.")
+                raise InvalidAsymmetricEncryptionTypeError(
+                    message=f"Invalid value for {key}.") from TypeError(value)
 
         elif key in symmetric_encryption_type:
             if value not in get_args(SymmetricEncryptionTypes):
-                raise ValueError(
-                    f"Value for {key} must be of type 'SymmetricEncryptionTypes'.")
+                raise InvalidSymmetricEncryptionTypeError(
+                    message=f"Invalid value for {key}.") from TypeError(value)
+
+        elif key in hash_type:
+            if value not in get_args(HashTypes):
+                raise InvalidHashTypeError(
+                    message=f"Invalid value for {key}.") from TypeError(value)
 
         elif key in boolean_type:
             if not isinstance(value, bool):
-                raise ValueError(f"Value for {key} must be of type 'bool'.")
+                raise TypeError(f"Value for {key} must be of type 'bool'.")
+            
+        elif key in connection_protocol_type:
+            if value not in get_args(ConnectionProtocolTypes):
+                raise InvalidConnectionProtocolError(
+                    message=f"Invalid value for {key}.") from TypeError(value)
+            
+        elif key in password_manager_type:
+            if value not in get_args(PasswordManagerTypes):
+                raise InvalidPasswordManagerTypeError(
+                    message=f"Invalid value for {key}.") from TypeError(value)
 
         else:
             raise ValueError(f"Field '{key}' not found in the configuration.")
 
-        if key in self.mutable.model_fields:
-            self.mutable = self.mutable.load(file_path=self.base_file_path)
-            setattr(self.mutable, key, value)
-            self.mutable.save(self.base_file_path)
-        else:
+        self.load()
+        setattr(self.users[username], key, value)
+        self.get_logger(username=username).info(
+            f"Updated '{key}' to '{value}'.")
+        self.save()
+
+    def delete(self, *, username: str) -> None:
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
+
+        if username not in self.users:
             raise ValueError(
-                f"Cannot update field '{key}' because it is immutable or not allowed.")
+                f"User '{username}' not found in the configuration.")
+        
+        self.load()
 
-    def get(self, *, key: Literal[
-        "IP",
-        "STORAGE_DIRECTORY",
-        "STORAGE_FILE_NAME",
-        "STORAGE_EXTENSION",
-        "EXPORT_DIRECTORY",
-        "EXPORT_FILE_NAME",
-        "APPLICATION_NAME",
-        "LOG_STRUCTURE",
-        "LOG_LEVEL",
-        "SIMILAR_CHARACTERS",
-        "CONTEXT_FILTERS",
-        "DEFAULT_PORT",
-        "ASYMMETRIC_ENCRYPTION_TYPE",
-        "SYMMETRIC_ENCRYPTION_TYPE",
-        "PASSWORD_LENGTH",
-        "UPPER_CASE_ALLOWED",
-        "LOWER_CASE_ALLOWED",
-        "DIGITS_ALLOWED",
-        "SYMBOLS_ALLOWED",
-        "SIMILAR_CHARACTERS_ALLOWED"
-    ]) -> Union[str, int, AsymmetricEncryptionTypes, SymmetricEncryptionTypes, bool, Dict[str, str], List[str]]:
-        """
-        pypasscrypt.config.BaseConfig.get
-        --------------------------------
+        storage_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
+        
+        if not isinstance(storage_file_name, str):
+            raise TypeError("Invalid storage_file_name")
+        
+        if os.path.exists(storage_file_name):
+            os.remove(storage_file_name)
 
-        Get the configuration field.
+        log_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_FILE_NAME", userhash=self.users[username].USERHASH)
+        
+        if not isinstance(log_file_name, str):
+            raise TypeError("Invalid log_file_name")
+        
+        if os.path.exists(log_file_name):
+            os.remove(log_file_name)
 
-        :param key: The key.
-        :return:  The value.
+        self.users.pop(username)
+        self.save()
 
-        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
-        """
-        self.mutable = self.mutable.load(file_path=self.base_file_path)
-        if key in self.mutable.model_fields:
-            return getattr(self.mutable, key)
-        elif key in self.immutable.model_fields:
-            return getattr(self.immutable, key)
+    def get_users(self) -> List[str]:
+        self.load()
+        return list(self.users.keys())
+
+    def get_logger(
+        self,
+        *,
+        username: str
+    ) -> Logger:
+        logger = getLogger(self.application_details.APPLICATION_NAME)
+
+        log_level: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_LEVEL", userhash=self.users[username].USERHASH)
+
+        if not isinstance(log_level, int):
+            raise TypeError("Invalid log_level")
+
+        log_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_FILE_NAME", userhash=self.users[username].USERHASH)
+
+        if not isinstance(log_file_name, str):
+            raise TypeError("Invalid log_file_name")
+
+        log_structure: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_STRUCTURE", userhash=self.users[username].USERHASH)
+
+        if not isinstance(log_structure, str):
+            raise TypeError("Invalid log_structure")
+
+        logger.setLevel(log_level)
+        formatter = Formatter(log_structure)
+        file_handler = FileHandler(log_file_name)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        return logger
+    
+    def get_storage(
+            self,
+            *,
+            username: str,
+            secret: str
+    ) -> EPC:
+        storage_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
+
+        if not isinstance(storage_file_name, str):
+            raise TypeError("Invalid storage_file_name")
+        
+        return EPC(
+            file_path=storage_file_name,
+            secret=secret,
+            symmetric_encryption_type=self.users[username].SYMMETRIC_ENCRYPTION_TYPE,
+            hash_type=self.users[username].HASH_TYPE,
+            logger=self.get_logger(username=username)
+        )
+    
+    def import_config(
+            self,
+            *,
+            username: str,
+            secret: str,
+            file_path: str
+    ) -> None:
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
+
+        if not isinstance(file_path, str):
+            raise TypeError("File path must be of type 'str'.")
+
+        if username not in self.users:
+            raise ValueError(
+                f"User '{username}' not found in the configuration.")
+
+        self.load()
+
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File '{file_path}' not found.")
+
+        storage_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
+
+        if not isinstance(storage_file_name, str):
+            raise TypeError("Invalid storage_file_name")
+
+        with open(file_path, "r") as file:
+            data = json.load(file)
+
+        if data["version"] != self.application_details.CONFIG_VERSION:
+            raise ValueError("Invalid configuration file version.")
         else:
-            raise ValueError(f"Field '{key}' not found in the configuration.")
+            del data["version"]
+        
+        data["USERHASH"] = self.users[username].USERHASH
 
+        self.delete(username=username)
+        
+        self.users[username] = UserDetails(**data)
 
-test = BaseConfig(base_file_path=os.path.join(os.path.dirname(__file__), "config.json"))    
+        storage_file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="STORAGE_FILE_NAME", userhash=self.users[username].USERHASH)
 
-print(test.get(key="DEFAULT_PORT"))
+        if not isinstance(storage_file_path, str):
+            raise TypeError("storage_file_path must be string.")
+
+        log_file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="LOG_FILE_NAME", userhash=self.users[username].USERHASH)
+
+        if not isinstance(log_file_path, str):
+            raise TypeError("log_file_path must be string.")
+
+        EPC.create(
+            secret=secret,
+            symmetric_encryption_type=self.users[username].SYMMETRIC_ENCRYPTION_TYPE,
+            hash_type=self.users[username].HASH_TYPE,
+            file_path=storage_file_path
+        )
+
+        with open(log_file_path, "w+") as file:
+            file.write(f"File created at {datetime.now().isoformat()}.")
+
+        self.save()
+
+    def export_config(
+            self,
+            *,
+            username: str
+    ) -> str:
+        if not isinstance(username, str):
+            raise TypeError("Username must be of type 'str'.")
+
+        if username not in self.users:
+            raise ValueError(
+                f"User '{username}' not found in the configuration.")
+
+        self.load()
+
+        file_path: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
+            key="EXPORT_CONFIG_FILE_NAME", userhash=self.users[username].USERHASH)
+        
+        if not isinstance(file_path, str):
+            raise TypeError("Invalid file_path")
+
+        counter: int = 1
+        new_file_path: str = file_path
+        while os.path.exists(new_file_path):
+            new_file_path = file_path.replace(
+                self.application_details.CONFIG_FILE_EXTENSION, f"_{counter}{self.application_details.CONFIG_FILE_EXTENSION}")
+
+        data: Dict[str, Union[str, bool, int]] = self.users[username].model_dump()
+
+        data["version"] = self.application_details.CONFIG_VERSION
+        del data["USERHASH"]
+
+        with open(new_file_path, "w+") as file:
+            json.dump(data, file, indent=4)
+
+        return new_file_path

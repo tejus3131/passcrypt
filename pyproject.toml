@@ -13,6 +13,7 @@ rich = "^13.7.1"
 pyperclip = "^1.9.0"
 inquirerpy = "^0.3.4"
 cryptography = "^42.0.8"
+pydantic = "^2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 sphinx = "^7.4.7"
@@ -23,4 +24,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-pm = "pm:main"
+run = "passcrypt:main"

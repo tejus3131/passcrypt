@@ -12,9 +12,27 @@ Interfaces:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Types:
+------
+- `ConnectionProtocolTypes`: A literal type for connection protocol classes.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exceptions:
+-----------
+- `InvalidConnectionProtocolError`: An exception for invalid connection protocols.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Classes:
 -------
 - `PassCryptConnectionProtocolHandler`: A class for the PassCrypt connection protocol.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exceptions:
+-----------
+- `InvalidConnectionProtocolError`: An exception for invalid connection protocols.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -31,8 +49,9 @@ __status__ = 'Development'
 
 # Public API
 __all__ = [
-    'ConnectionProtocolTypes',
     'IConnectionProtocolHandler',
+    'ConnectionProtocolTypes',
+    'InvalidConnectionProtocolError',
     'ConnectionProtocolHandler',
     '__version__',
     '__author__',
@@ -57,7 +76,6 @@ from abc import (
     abstractmethod
 )
 from typing import (
-    Dict,
     Optional,
     Tuple,
     Union,
@@ -67,6 +85,10 @@ from typing import (
 from pypasscrypt.cryptohandler import (
     AsymmetricCryptoHandler,
     AsymmetricEncryptionTypes
+)
+from pypasscrypt.storagehandler import (
+    PasswordBucket,
+    InvalidPasswordBucketError
 )
 
 
@@ -221,7 +243,7 @@ class IConnectionProtocolHandler(ABC):
             *,
             sender_details: Tuple[socket, bytes, bytes],
             asymmetric_encryption_type: AsymmetricEncryptionTypes
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> PasswordBucket:
         """
         # pypasscrypt.connection.IConnectionProtocolHandler.receive_data
         -------------------------------------------------------
@@ -258,7 +280,7 @@ class IConnectionProtocolHandler(ABC):
     @abstractmethod
     def send_data(
             *,
-            listings: Dict[str, Dict[str, str]],
+            listings: PasswordBucket,
             connection_code: str
     ) -> None:
         """
@@ -508,7 +530,7 @@ class PassCryptConnectionProtocolHandler(IConnectionProtocolHandler):
             *,
             sender_details: Tuple[socket, bytes, bytes],
             asymmetric_encryption_type: AsymmetricEncryptionTypes
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> PasswordBucket:
         """
         # pypasscrypt.connection.PassCryptConnectionProtocolHandler.receive_data
         ---------------------------------------------------------------
@@ -572,18 +594,23 @@ class PassCryptConnectionProtocolHandler(IConnectionProtocolHandler):
             while len(encrypted_data) < length:
                 encrypted_data += connection.recv(1024)
 
-            json_data: Dict[str, Dict[str, str]] = AsymmetricCryptoHandler.decrypt(
+            data_str: str = AsymmetricCryptoHandler.decrypt(
                 encrypted_data=encrypted_data,
                 private_key_pem=private_key_pem,
                 method=asymmetric_encryption_type
             )
+
+            try:
+                json_data: PasswordBucket = PasswordBucket.from_string(data_str)
+            except InvalidPasswordBucketError as e:
+                raise ValueError('Invalid data received') from e
 
         return json_data
 
     @staticmethod
     def send_data(
             *,
-            listings: Dict[str, Dict[str, str]],
+            listings: PasswordBucket,
             connection_code: str
     ) -> None:
         """
@@ -612,19 +639,8 @@ class PassCryptConnectionProtocolHandler(IConnectionProtocolHandler):
         Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
         """
 
-        if not isinstance(listings, dict):
-            raise TypeError("Invalid listings")
-        else:
-            for key, value in listings.items():
-                if not isinstance(key, str):
-                    raise TypeError("Invalid listings")
-                if not isinstance(value, dict):
-                    raise TypeError("Invalid listings")
-                for k, v in value.items():
-                    if not isinstance(k, str):
-                        raise TypeError("Invalid listings")
-                    if not isinstance(v, str):
-                        raise TypeError("Invalid listings")
+        if not isinstance(listings, PasswordBucket):
+            raise TypeError('listings must be a PasswordBucket')
                     
         if not isinstance(connection_code, str):
             raise TypeError('connection_code must be a string')
@@ -661,7 +677,7 @@ class PassCryptConnectionProtocolHandler(IConnectionProtocolHandler):
             raise ValueError('Invalid asymmetric encryption type')
 
         encrypted_data: bytes = AsymmetricCryptoHandler.encrypt(
-            json_data=listings,
+            data=str(listings),
             public_key_pem=public_key_pem,
             method=asymmetric_encryption_type
         )
@@ -689,6 +705,39 @@ Values:
 
 Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
 """
+
+
+class InvalidConnectionProtocolError(Exception):
+    """
+    # pypasscrypt.connection.InvalidConnectionProtocolError
+    -----------------------------------------------------
+
+    An exception for invalid connection protocols.
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
+    """
+
+    def __init__(self, message: str = 'Invalid connection protocol') -> None:
+        """
+        # pypasscrypt.connection.InvalidConnectionProtocolError.__init__
+        -----------------------------------------------------------
+
+        Initialize the exception.
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        Parameters:
+        -----------
+        - `message`: The error message.
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
+        """
+
+        super().__init__(message)
 
 
 class ConnectionProtocolHandler:
@@ -801,6 +850,7 @@ class ConnectionProtocolHandler:
         Raises:
         -------
         - `TypeError`: If the connection protocol is invalid.
+        - `ValueError`: If the connection code number is invalid.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -881,7 +931,7 @@ class ConnectionProtocolHandler:
             sender_details: Tuple[socket, bytes, bytes],
             asymmetric_encryption_type: AsymmetricEncryptionTypes,
             connection_protocol: ConnectionProtocolTypes
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> PasswordBucket:
         """
         # pypasscrypt.connection.ConnectionProtocolHandler.receive_data
         ------------------------------------------------------------
@@ -930,7 +980,7 @@ class ConnectionProtocolHandler:
     @staticmethod
     def send_data(
             *,
-            listings: Dict[str, Dict[str, str]],
+            listings: PasswordBucket,
             connection_code: str,
             connection_protocol: ConnectionProtocolTypes
     ) -> None:

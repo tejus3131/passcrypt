@@ -13,6 +13,10 @@ Types:
 - `PasswordStrength`: The strength of a password.
 - `PasswordManagerTypes`: The types of password managers available.
 
+Exceptions:
+----------
+- `InvalidPasswordManagerTypeError`: An exception for invalid password manager types.
+
 Classes:
 -------
 - `PasswordManagerHandler`: A class for password generation and strength checking.
@@ -30,8 +34,10 @@ __status__ = 'Development'
 
 # Public API
 __all__ = [
-    'PasswordManagerTypes',
+    'PasswordStrength',
     'IPasswordManagerHandler',
+    'PasswordManagerTypes',
+    'InvalidPasswordManagerTypeError',
     'PasswordManagerHandler',
     '__version__',
     '__author__',
@@ -534,7 +540,7 @@ class PassCryptPasswordManager(IPasswordManagerHandler):
         password_options: List[str] = []
         for _ in range(PassCryptPasswordManager.EPOCHS):
             password_parts: List[str] = sample(allowed_chars, length*2)
-            password_parts[randint(0, length*2 - 1)] = choice(context_list)
+            password_parts[randint(0, length*2 - 1)] = choice(context_list) if context_list else choice(allowed_chars)
             password_str: str = ''.join(password_parts)
             slice_index: int = randint(0, len(password_str) - length)
             password_options.append(
@@ -574,6 +580,38 @@ Values:
 
 Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
 """
+
+
+class InvalidPasswordManagerTypeError(TypeError):
+    """
+    # pypasscrypt.passwordmanager.InvalidPasswordManagerTypeError
+    -----------------------------------------------------------
+
+    An exception for invalid password manager types.
+
+    ~~~~~~~~~~~~~~~
+
+    Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
+    """
+
+    def __init__(self, message: str = "Invalid password manager type.") -> None:
+        """
+        # pypasscrypt.passwordmanager.InvalidPasswordManagerTypeError.__init__
+        -------------------------------------------------------------------
+
+        Initialize the exception.
+
+        ~~~~~~~~~~~~~~~
+
+        Parameters:
+        -----------
+        - `message`: The error message.
+
+        ~~~~~~~~~~~~~~~
+
+        Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
+        """
+        super().__init__(message)
 
 
 class PasswordManagerHandler:
