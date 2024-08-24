@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import json
 from pathlib import Path
+from time import sleep
 from pydantic import (
     BaseModel,
     Field
@@ -543,16 +544,10 @@ class Config(BaseModel):
         if os.path.exists(storage_file_name):
             os.remove(storage_file_name)
 
-        log_file_name: Union[str, int, Dict[str, str], List[str]] = self.application_details.get(
-            key="LOG_FILE_NAME", userhash=self.users[username].USERHASH)
-        
-        if not isinstance(log_file_name, str):
-            raise TypeError("Invalid log_file_name")
-        
-        if os.path.exists(log_file_name):
-            os.remove(log_file_name)
-
-        self.users.pop(username)
+        self.get_logger(username=username).info(
+            f"Deleted user '{username}'.")
+            
+        del self.users[username]
         self.save()
 
     def get_users(self) -> List[str]:
@@ -707,6 +702,8 @@ class Config(BaseModel):
 
         data["version"] = self.application_details.CONFIG_VERSION
         del data["USERHASH"]
+        
+        os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
 
         with open(new_file_path, "w+") as file:
             json.dump(data, file, indent=4)

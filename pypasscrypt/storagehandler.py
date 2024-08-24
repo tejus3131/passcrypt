@@ -463,16 +463,13 @@ class PasswordBucket:
         """
 
         if not isinstance(site, str):
-            raise InvalidPasswordBucketError(
-                message="Site name must be a string.") from TypeError(site)
+            raise TypeError("Site name must be a string.")
 
         if not isinstance(username, str):
-            raise InvalidPasswordBucketError(
-                message="Username name must be a string.") from TypeError(username)
-
-        if site not in self.data:
-            raise InvalidPasswordBucketError(
-                message=f"Site not found: {site}") from ValueError(site)
+            raise TypeError("Username name must be a string.")
+        
+        if not self.is_site_exists(site=site):
+            return False
 
         return username in self.data[site]
 
@@ -867,6 +864,7 @@ class EPC:
         self.hash_type: HashTypes = hash_type
         self.logger: Logger = logger
         self.hash_length: int = 32
+        self.current_commit_hash: str = ""
 
         # Verify the EPC object
         self.verify()
@@ -979,6 +977,7 @@ class EPC:
                 
                 # Read commit hash length (4 bytes)
                 self.hash_length = unpack('I', file.read(4))[0]
+                self.current_commit_hash = hexlify(file.read(self.hash_length)).decode()
 
         except ValueError as e:
             raise InvalidEPCFileError(message="Invalid file") from e
@@ -1011,14 +1010,8 @@ class EPC:
         # Verify the EPC object
         self.verify()
 
-        # Get the current commit hash
-        with open(self.file_path, 'rb+') as file:
-            file.seek(132)  # Skip the first 4 hashes
-            current_commit_hash: bytes = file.read(self.hash_length)
-
         # Get the data for the current commit hash
-        data: Tuple[str, PasswordBucket] = self.load_commit_data(
-            commit_hash=hexlify(current_commit_hash).decode())
+        data: Tuple[str, PasswordBucket] = self.load_commit_data(commit_hash=self.current_commit_hash)
 
         # Log the data load
         self.logger.info(msg=f"Loaded data for: {reason}")
@@ -1052,39 +1045,53 @@ class EPC:
 
         temp_file_path: str = f"{self.file_path}.tmp"
         with open(self.file_path, 'rb+') as epc_file, open(temp_file_path, 'wb+') as tmp_file:
+            # seek to start
+            tmp_file.seek(0)
 
-            # Write the file version hash
-            tmp_file.write(unhexlify(HashHandler.generate_hash(
-                data=self.FILE_VERSION,
+            # Write file version (32 bytes)
+            hashed_file_version: bytes = unhexlify(HashHandler.generate_hash(
+                data=EPC.FILE_VERSION,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_file_version)=:>25}  {hashed_file_version=}")
+            tmp_file.write(hashed_file_version)
 
-            # Write the password hash
-            tmp_file.write(unhexlify(HashHandler.generate_hash(
+            # Write password hash (32 bytes)
+            hashed_secret: bytes = unhexlify(HashHandler.generate_hash(
                 data=self.secret,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_secret)=:>31}  {hashed_secret=}")
+            tmp_file.write(hashed_secret)
 
-            # Write the encryption type hash
-            tmp_file.write(HashHandler.generate_hash(
+            # Write encryption type hash (32 bytes)
+            hashed_symmetric_encryption_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=self.symmetric_encryption_type,
                 method="SHA256"
             ).encode())
+            # print(f"{len(hashed_symmetric_encryption_type)=:>12}  {hashed_symmetric_encryption_type=}")
+            tmp_file.write(hashed_symmetric_encryption_type)
 
-            # Write the hash type hash
-            tmp_file.write(HashHandler.generate_hash(
+            # Write hash type hash (32 bytes)
+            hashed_hash_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=self.hash_type,
                 method="SHA256"
             ).encode())
-
-            # write the commit hash length
-            tmp_file.write(pack('I', self.hash_length))
+            # print(f"{len(hashed_hash_type)=:>28}  {hashed_hash_type=}")
+            tmp_file.write(hashed_hash_type)
 
             # create a new commit hash
             new_commit_hash: bytes = unhexlify(HashHandler.generate_hash(
-                data=commit_message,
+                data=datetime.now().isoformat(),
                 method=self.hash_type
             ).encode())
+
+            # write current commit hash length (4 bytes)
+            packed_hash_length: bytes = pack('I', len(new_commit_hash))
+            # print(f"{len(packed_hash_length)=:>26}  {packed_hash_length=}")
+            tmp_file.write(packed_hash_length)
+
+            # print("base structure size:                          ", tmp_file.tell(), end="\n\n")
 
             # encrypt the message
             encrypted_message: bytes = SymmetricCryptoHandler.encrypt(
@@ -1100,19 +1107,49 @@ class EPC:
                 method=self.symmetric_encryption_type
             )
 
-            # Write the current commit hash
+            # Write the new commit
+            # print(f"{len(new_commit_hash)=:>29}  {new_commit_hash=}")
             tmp_file.write(new_commit_hash)
 
-            # Write the new commit
+            # Write the current commit
+            # print(f"{len(new_commit_hash)=:>29}  {new_commit_hash=}")
             tmp_file.write(new_commit_hash)
+
             tmp_file.write(pack('I', len(encrypted_message)))
+            # print(f"{len(encrypted_message)=:>27}  {encrypted_message=}")
             tmp_file.write(encrypted_message)
+
             tmp_file.write(pack('I', len(encrypted_data)))
+            # print(f"{len(encrypted_data)=:>30}  {encrypted_data=}")
             tmp_file.write(encrypted_data)
 
-            # Write the old data
             epc_file.seek(132 + self.hash_length)
-            tmp_file.write(epc_file.read())
+
+            # Write the rest of the file
+            while True:
+                current_commit_hash: bytes = epc_file.read(self.hash_length)
+
+                if not current_commit_hash:
+                    break
+
+                # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
+                
+                commit_message_length: int = unpack('I', epc_file.read(4))[0]
+                encrypted_commit_message = epc_file.read(commit_message_length)
+                # print(f"{commit_message_length=:>28}  {encrypted_commit_message=}")
+
+
+                commit_data_length: int = unpack('I', epc_file.read(4))[0]
+                encrypted_commit_data = epc_file.read(commit_data_length)
+                # print(f"{commit_data_length=:>31}  {encrypted_commit_data=}")
+
+                tmp_file.write(current_commit_hash)
+                tmp_file.write(pack('I', commit_message_length))
+                tmp_file.write(encrypted_commit_message)
+                tmp_file.write(pack('I', commit_data_length))
+                tmp_file.write(encrypted_commit_data)
+
+                
 
         # Log the commit save
         self.logger.info(msg=commit_message)
@@ -1146,12 +1183,10 @@ class EPC:
         Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
         """
         self.verify()
-
         try:
 
             with open(self.file_path, 'rb+') as file:
                 file.seek(132 + self.hash_length)  # Skip the first 5 hashes
-
                 commits: List[Tuple[str, str]] = []
 
                 while True:
@@ -1161,31 +1196,30 @@ class EPC:
                     # Check if the commit hash is valid
                     if not current_commit_hash:
                         break
+                    # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
 
                     # Read the commit message
                     commit_message_length: int = unpack('I', file.read(4))[0]
 
+                    commit_message_bytes: bytes = file.read(commit_message_length)
+                    # print(f"{commit_message_length=:>28}  {commit_message_bytes=}")
+
                     # Decrypt the commit message
                     decrypted_message: str = SymmetricCryptoHandler.decrypt(
-                        encrypted_data=file.read(commit_message_length),
+                        encrypted_data=commit_message_bytes,
                         password=self.secret,
                         method=self.symmetric_encryption_type
                     )
 
-                    # Check if the commit message is valid
-                    if isinstance(decrypted_message, str):
-                        commit_message = decrypted_message
-                    else:
-                        self.logger.error(msg="Invalid commit message")
-                        raise ValueError("Invalid commit message")
-
                     # Decrypt the commit data
                     commit_data_length: int = unpack('I', file.read(4))[0]
-                    file.seek(commit_data_length, 1)
+                    
+                    commit_data_bytes: bytes = file.read(commit_data_length)
+                    # print(f"{commit_data_length=:>31}  {commit_data_bytes=}")
 
                     # Add the commit to the list
                     commits.append(
-                        (hexlify(current_commit_hash).decode(), commit_message))
+                        (hexlify(current_commit_hash).decode(), decrypted_message))
 
         except ValueError as e:
             raise InvalidEPCFileError(message="Invalid file") from e
@@ -1368,40 +1402,60 @@ class EPC:
             with open(self.file_path, 'rb+') as epc_file, open(temp_file_path, 'wb+') as tmp_file:
 
                 # seek to the first commit hash
-                epc_file.seek(0)
                 tmp_file.seek(0)
 
                 # Copy the first hash
-                tmp_file.write(epc_file.read(32))
+                hashed_file_version: bytes = unhexlify(HashHandler.generate_hash(
+                    data=EPC.FILE_VERSION,
+                    method="SHA256"
+                ).encode())
+                # print(f"{len(hashed_file_version)=:>25}  {hashed_file_version=}")
+                tmp_file.write(hashed_file_version)
 
                 # Write the new secret hash
-                tmp_file.write(unhexlify(HashHandler.generate_hash(
+                hashed_secret: bytes = unhexlify(HashHandler.generate_hash(
                     data=new_secret,
-                    method=self.hash_type
-                ).encode()))
+                    method="SHA256"
+                ).encode())
+                # print(f"{len(hashed_secret)=:>31}  {hashed_secret=}")
+                tmp_file.write(hashed_secret)
 
-                # skip the next hash
-                epc_file.seek(32, 1)
+                # Write encryption type hash (32 bytes)
+                hashed_symmetric_encryption_type: bytes = unhexlify(HashHandler.generate_hash(
+                    data=self.symmetric_encryption_type,
+                    method="SHA256"
+                ).encode())
+                # print(f"{len(hashed_symmetric_encryption_type)=:>12}  {hashed_symmetric_encryption_type=}")
+                tmp_file.write(hashed_symmetric_encryption_type)
 
-                # Copy the last 2 hashes
-                tmp_file.write(epc_file.read(32 * 2))
+                # Write hash type hash (32 bytes)
+                hashed_hash_type: bytes = unhexlify(HashHandler.generate_hash(
+                    data=self.hash_type,
+                    method="SHA256"
+                ).encode())
+                # print(f"{len(hashed_hash_type)=:>28}  {hashed_hash_type=}")
+                tmp_file.write(hashed_hash_type)
+                
+                epc_file.seek(128)
+                packed_hash_length: bytes = epc_file.read(4)
+                # print(f"{len(packed_hash_length)=:>26}  {packed_hash_length=}")
+                tmp_file.write(packed_hash_length)
 
-                # write the commit hash length
-                tmp_file.write(epc_file.read(4))
-
-                # write current commit hash
-                tmp_file.write(epc_file.read(self.hash_length))
+                commit_hash: bytes = epc_file.read(self.hash_length)
+                # print(f"{len(commit_hash)=:>33}  {commit_hash=}")
+                tmp_file.write(commit_hash)
 
                 while True:
-                    commit_hash: bytes = epc_file.read(self.hash_length)
-                    if not commit_hash:
+                    current_commit_hash: bytes = epc_file.read(self.hash_length)
+
+                    if not current_commit_hash:
                         break
 
+                    # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
+
                     # Read the commit message
-                    commit_message_length: int = unpack(
-                        'I', epc_file.read(4))[0]
-                    commit_message: bytes = epc_file.read(
-                        commit_message_length)
+                    commit_message_length: int = unpack('I', epc_file.read(4))[0]
+                    commit_message: bytes = epc_file.read(commit_message_length)
 
                     # decrypt the commit message
                     decrypted_message: str = SymmetricCryptoHandler.decrypt(
@@ -1411,11 +1465,13 @@ class EPC:
                     )
 
                     # Encrypt the commit message with the new secret
-                    encrypted_message: bytes = SymmetricCryptoHandler.encrypt(
+                    encrypted_commit_message = SymmetricCryptoHandler.encrypt(
                         data=decrypted_message,
                         password=new_secret,
                         method=self.symmetric_encryption_type
                     )
+                    
+                    # print(f"{commit_message_length=:>28}  {encrypted_commit_message=}")
 
                     # Read the commit data
                     commit_data_length: int = unpack('I', epc_file.read(4))[0]
@@ -1429,18 +1485,19 @@ class EPC:
                     )
 
                     # Encrypt the commit data with the new secret
-                    encrypted_data: bytes = SymmetricCryptoHandler.encrypt(
+                    encrypted_commit_data: bytes = SymmetricCryptoHandler.encrypt(
                         data=decrypted_data,
                         password=new_secret,
                         method=self.symmetric_encryption_type
                     )
+                    # print(f"{commit_data_length=:>31}  {encrypted_commit_data=}")
 
                     # Write the new commit to the file
-                    tmp_file.write(commit_hash)
-                    tmp_file.write(pack('I', len(encrypted_message)))
-                    tmp_file.write(encrypted_message)
-                    tmp_file.write(pack('I', len(encrypted_data)))
-                    tmp_file.write(encrypted_data)
+                    tmp_file.write(current_commit_hash)
+                    tmp_file.write(pack('I', commit_message_length))
+                    tmp_file.write(encrypted_commit_message)
+                    tmp_file.write(pack('I', commit_data_length))
+                    tmp_file.write(encrypted_commit_data)
 
         except ValueError as e:
             raise InvalidEPCFileError(message="Invalid file") from e
@@ -1450,6 +1507,9 @@ class EPC:
 
         # Replace the old file with the new file
         os.replace(temp_file_path, self.file_path)
+
+        # Update the secret
+        self.secret = new_secret
 
     def change_encryption_type(
             self,
@@ -1487,76 +1547,111 @@ class EPC:
         with open(self.file_path, 'rb+') as epc_file, open(temp_file_path, 'wb+') as tmp_file:
 
             # seek to the first commit hash
-            epc_file.seek(0)
             tmp_file.seek(0)
 
-            # Copy the first 2 hashes
-            tmp_file.write(epc_file.read(32 * 2))
+            # Write file version (32 bytes)
+            hashed_file_version: bytes = unhexlify(HashHandler.generate_hash(
+                data=EPC.FILE_VERSION,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_file_version)=:>25}  {hashed_file_version=}")
+            tmp_file.write(hashed_file_version)
 
-            # Write the new encryption type hash
-            tmp_file.write(unhexlify(HashHandler.generate_hash(
+            # Write password hash (32 bytes)
+            hashed_secret: bytes = unhexlify(HashHandler.generate_hash(
+                data=self.secret,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_secret)=:>31}  {hashed_secret=}")
+            tmp_file.write(hashed_secret)
+
+            # Write encryption type hash (32 bytes)
+            hashed_symmetric_encryption_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=new_symmetric_encryption_type,
-                method=self.hash_type
-            ).encode()))
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_symmetric_encryption_type)=:>12}  {hashed_symmetric_encryption_type=}")
+            tmp_file.write(hashed_symmetric_encryption_type)
 
-            epc_file.seek(32, 1)
+            # Write hash type hash (32 bytes)
+            hashed_hash_type: bytes = unhexlify(HashHandler.generate_hash(
+                data=self.hash_type,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_hash_type)=:>28}  {hashed_hash_type=}")
+            tmp_file.write(hashed_hash_type)
 
-            tmp_file.write(epc_file.read(32))
-            tmp_file.write(epc_file.read(4))
+            epc_file.seek(128)
+            packed_hash_length: bytes = epc_file.read(4)
+            # print(f"{len(packed_hash_length)=:>26}  {packed_hash_length=}")
+            tmp_file.write(packed_hash_length)
 
+            commit_hash: bytes = epc_file.read(self.hash_length)
+            # print(f"{len(commit_hash)=:>33}  {commit_hash=}")
+            tmp_file.write(commit_hash)
+            
             while True:
-                commit_hash = epc_file.read(self.hash_length)
-                if not commit_hash:
-                    break
+                    current_commit_hash: bytes = epc_file.read(self.hash_length)
 
-                # Read the commit message
-                commit_message_length: int = unpack('I', epc_file.read(4))[0]
-                commit_message: bytes = epc_file.read(commit_message_length)
+                    if not current_commit_hash:
+                        break
 
-                # Decrypt the commit message
-                decrypted_message: str = SymmetricCryptoHandler.decrypt(
-                    encrypted_data=commit_message,
-                    password=self.secret,
-                    method=self.symmetric_encryption_type
-                )
+                    # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
 
-                # Encrypt the commit message with the new encryption type
-                encrypted_message: bytes = SymmetricCryptoHandler.encrypt(
-                    data=decrypted_message,
-                    password=self.secret,
-                    method=new_symmetric_encryption_type
-                )
+                    # Read the commit message
+                    commit_message_length: int = unpack('I', epc_file.read(4))[0]
+                    commit_message: bytes = epc_file.read(commit_message_length)
 
-                # Read the commit data
-                commit_data_length: int = unpack('I', epc_file.read(4))[0]
-                commit_data: bytes = epc_file.read(commit_data_length)
+                    # decrypt the commit message
+                    decrypted_message: str = SymmetricCryptoHandler.decrypt(
+                        encrypted_data=commit_message,
+                        password=self.secret,
+                        method=self.symmetric_encryption_type
+                    )
 
-                # Decrypt the commit data
-                decrypted_data: str = SymmetricCryptoHandler.decrypt(
-                    encrypted_data=commit_data,
-                    password=self.secret,
-                    method=self.symmetric_encryption_type
-                )
+                    # Encrypt the commit message with the new secret
+                    encrypted_commit_message = SymmetricCryptoHandler.encrypt(
+                        data=decrypted_message,
+                        password=self.secret,
+                        method=new_symmetric_encryption_type
+                    )
+                    
+                    # print(f"{commit_message_length=:>28}  {encrypted_commit_message=}")
 
-                # Encrypt the commit data with the new encryption type
-                encrypted_data = SymmetricCryptoHandler.encrypt(
-                    data=decrypted_data,
-                    password=self.secret,
-                    method=new_symmetric_encryption_type
-                )
+                    # Read the commit data
+                    commit_data_length: int = unpack('I', epc_file.read(4))[0]
+                    commit_data: bytes = epc_file.read(commit_data_length)
 
-                # Write the new commit to the file
-                tmp_file.write(commit_hash)
-                tmp_file.write(pack('I', len(encrypted_message)))
-                tmp_file.write(encrypted_message)
-                tmp_file.write(pack('I', len(encrypted_data)))
-                tmp_file.write(encrypted_data)
+                    # Decrypt the commit data
+                    decrypted_data: str = SymmetricCryptoHandler.decrypt(
+                        encrypted_data=commit_data,
+                        password=self.secret,
+                        method=self.symmetric_encryption_type
+                    )
+
+                    # Encrypt the commit data with the new secret
+                    encrypted_commit_data: bytes = SymmetricCryptoHandler.encrypt(
+                        data=decrypted_data,
+                        password=self.secret,
+                        method=new_symmetric_encryption_type
+                    )
+                    # print(f"{commit_data_length=:>31}  {encrypted_commit_data=}")
+
+                    # Write the new commit to the file
+                    tmp_file.write(current_commit_hash)
+                    tmp_file.write(pack('I', commit_message_length))
+                    tmp_file.write(encrypted_commit_message)
+                    tmp_file.write(pack('I', commit_data_length))
+                    tmp_file.write(encrypted_commit_data)
 
         # Log the encryption type change
         self.logger.warning(msg="Changed encryption type")
 
         # Replace the old file with the new file
         os.replace(temp_file_path, self.file_path)
+
+        # Update the encryption type
+        self.symmetric_encryption_type = new_symmetric_encryption_type
 
     def change_hash_type(
             self,
@@ -1594,37 +1689,71 @@ class EPC:
         with open(self.file_path, 'rb+') as epc_file, open(temp_file_path, 'wb+') as tmp_file:
 
             # seek to the first commit hash
-            epc_file.seek(0)
             tmp_file.seek(0)
 
-            # Copy the first 3 hashes
-            tmp_file.write(epc_file.read(32 * 3))
+            # Write file version (32 bytes)
+            hashed_file_version: bytes = unhexlify(HashHandler.generate_hash(
+                data=EPC.FILE_VERSION,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_file_version)=:>25}  {hashed_file_version=}")
+            tmp_file.write(hashed_file_version)
 
-            # Write the new hash type hash
-            tmp_file.write(unhexlify(HashHandler.generate_hash(
+            # Write password hash (32 bytes)
+            hashed_secret: bytes = unhexlify(HashHandler.generate_hash(
+                data=self.secret,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_secret)=:>31}  {hashed_secret=}")
+            tmp_file.write(hashed_secret)
+
+            # Write encryption type hash (32 bytes)
+            hashed_symmetric_encryption_type: bytes = unhexlify(HashHandler.generate_hash(
+                data=self.symmetric_encryption_type,
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_symmetric_encryption_type)=:>12}  {hashed_symmetric_encryption_type=}")
+            tmp_file.write(hashed_symmetric_encryption_type)
+
+            # Write hash type hash (32 bytes)
+            hashed_hash_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=new_hash_type,
-                method=self.hash_type
-            ).encode()))
+                method="SHA256"
+            ).encode())
+            # print(f"{len(hashed_hash_type)=:>28}  {hashed_hash_type=}")
+            tmp_file.write(hashed_hash_type)
+            
+            epc_file.seek(132)
 
-            # skip the next hash and hash length
-            epc_file.seek(36, 1)
-
-            current_commit_hash: str = hexlify(epc_file.read(self.hash_length)).decode()
+            commit_hash_str: str = hexlify(epc_file.read(self.hash_length)).decode()
             new_commit_hash: bytes = unhexlify(HashHandler.generate_hash(
-                data=current_commit_hash,
+                data=commit_hash_str,
                 method=new_hash_type
             ).encode())
 
             # Write the new commit hash length
-            tmp_file.write(pack('I', len(new_commit_hash)))
+            packed_hash_length: bytes = pack('I', len(new_commit_hash))
+            # print(f"{len(packed_hash_length)=:>26}  {packed_hash_length=}")
+            tmp_file.write(packed_hash_length)
 
             # Write the new commit hash
             tmp_file.write(new_commit_hash)            
 
             while True:
-                commit_hash = epc_file.read(self.hash_length)
-                if not commit_hash:
+                current_commit_hash = epc_file.read(self.hash_length)
+                if not current_commit_hash:
                     break
+
+                # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
+
+                current_commit_str: str = hexlify(current_commit_hash).decode()
+                new_current_commit: bytes = unhexlify(HashHandler.generate_hash(
+                    data=current_commit_str,
+                    method=new_hash_type
+                ).encode())
+
+                if len(new_current_commit) != len(new_commit_hash):
+                    raise ValueError("Invalid commit length")
 
                 # Read the commit message
                 commit_message_length: int = unpack('I', epc_file.read(4))[0]
@@ -1635,7 +1764,7 @@ class EPC:
                 commit_data: bytes = epc_file.read(commit_data_length)
                 
                 # Write the new commit to the file
-                tmp_file.write(commit_hash)
+                tmp_file.write(new_current_commit)
                 tmp_file.write(pack('I', commit_message_length))
                 tmp_file.write(commit_message)
                 tmp_file.write(pack('I', commit_data_length))
@@ -1823,28 +1952,36 @@ class EPC:
             file.seek(0)
 
             # Write file version (32 bytes)
-            file.write(unhexlify(HashHandler.generate_hash(
+            hashed_file_version: bytes = unhexlify(HashHandler.generate_hash(
                 data=EPC.FILE_VERSION,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_file_version)=:>25}  {hashed_file_version=}")
+            file.write(hashed_file_version)
 
             # Write password hash (32 bytes)
-            file.write(unhexlify(HashHandler.generate_hash(
+            hashed_secret: bytes = unhexlify(HashHandler.generate_hash(
                 data=secret,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_secret)=:>31}  {hashed_secret=}")
+            file.write(hashed_secret)
 
             # Write encryption type hash (32 bytes)
-            file.write(unhexlify(HashHandler.generate_hash(
+            hashed_symmetric_encryption_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=symmetric_encryption_type,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_symmetric_encryption_type)=:>12}  {hashed_symmetric_encryption_type=}")
+            file.write(hashed_symmetric_encryption_type)
 
             # Write hash type hash (32 bytes)
-            file.write(unhexlify(HashHandler.generate_hash(
+            hashed_hash_type: bytes = unhexlify(HashHandler.generate_hash(
                 data=hash_type,
                 method="SHA256"
-            ).encode()))
+            ).encode())
+            # print(f"{len(hashed_hash_type)=:>28}  {hashed_hash_type=}")
+            file.write(hashed_hash_type)
 
             # create a new commit hash
             current_commit_hash: bytes = unhexlify(HashHandler.generate_hash(
@@ -1853,12 +1990,18 @@ class EPC:
             ).encode())
 
             # write current commit hash length (4 bytes)
-            file.write(pack('I', len(current_commit_hash)))
+            packed_hash_length: bytes = pack('I', len(current_commit_hash))
+            # print(f"{len(packed_hash_length)=:>26}  {packed_hash_length=}")
+            file.write(packed_hash_length)
+
+            # print("base structure size:                          ", file.tell(), end="\n\n")
 
             # write current commit hash (32 bytes)
+            # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
             file.write(current_commit_hash)
 
             # create a new commit hash (32 bytes)
+            # print(f"{len(current_commit_hash)=:>25}  {current_commit_hash=}")
             file.write(current_commit_hash)
 
             # encrypt the commit message
@@ -1870,6 +2013,7 @@ class EPC:
             )
 
             # Write commit message length (4 bytes)
+            # print(f"{len(encrypted_commit_message)=:>20}  {encrypted_commit_message=}")
             file.write(pack('I', len(encrypted_commit_message)))
 
             # Write commit message (n bytes)
@@ -1882,6 +2026,7 @@ class EPC:
             )
 
             # Write data length (4 bytes)
+            # print(f"{len(encrypted_data)=:>30}  {encrypted_data=}")
             file.write(pack('I', len(encrypted_data)))
 
             # Write data (n bytes)
@@ -1952,7 +2097,7 @@ class EPC:
 
         return data.get_listings()
     
-    def is_site_exists(self, site: str) -> bool:
+    def is_site_exists(self, *, site: str) -> bool:
         """
         # pypasscrypt.storagehandler.EPC.is_site_exists
         -----------------------------------
@@ -1979,7 +2124,7 @@ class EPC:
 
         return data.is_site_exists(site=site)
     
-    def get_usernames_by_site(self, site: str) -> List[str]:
+    def get_usernames_by_site(self, *, site: str) -> List[str]:
         """
         # pypasscrypt.storagehandler.EPC.get_usernames_by_site
         ----------------------------------------------
@@ -2006,7 +2151,7 @@ class EPC:
 
         return data.get_usernames_by_site(site=site)
     
-    def is_username_exists(self, site: str, username: str) -> bool:
+    def is_username_exists(self, *, site: str, username: str) -> bool:
         """
         # pypasscrypt.storagehandler.EPC.is_username_exists
         ---------------------------------------
@@ -2034,7 +2179,7 @@ class EPC:
 
         return data.is_username_exists(site=site, username=username)
     
-    def add_password(self, site: str, username: str, password: str) -> None:
+    def add_password(self, *, site: str, username: str, password: str) -> None:
         """
         # pypasscrypt.storagehandler.EPC.add_password
         ----------------------------------
@@ -2073,9 +2218,9 @@ class EPC:
 
         data.add_password(site=site, username=username, password=password)
 
-        self.save(commit_data=data, commit_message=f"Added password for site: {site}")
+        self.save(commit_data=data, commit_message=f"Added password for {username} in {site}")
 
-    def edit_password(self, site: str, username: str, password: str) -> None:
+    def edit_password(self, *, site: str, username: str, password: str) -> None:
         """
         # pypasscrypt.storagehandler.EPC.edit_password
         -----------------------------------
@@ -2114,10 +2259,9 @@ class EPC:
 
         data.edit_password(site=site, username=username, password=password)
 
-        self.save(commit_data=data, commit_message=f"Edited password for site: {site}")
+        self.save(commit_data=data, commit_message=f"Edited password for {username} in {site}")
 
-
-    def remove_password(self, site: str, username: str) -> None:
+    def remove_password(self, *, site: str, username: str) -> None:
         """
         # pypasscrypt.storagehandler.EPC.remove_password
         -------------------------------------
@@ -2152,9 +2296,9 @@ class EPC:
 
         data.remove_password(site=site, username=username)
 
-        self.save(commit_data=data, commit_message=f"Deleted password for site: {site}")
+        self.save(commit_data=data, commit_message=f"Deleted password for {username} in {site}")
 
-    def get_password(self, site: str, username: str) -> str:
+    def get_password(self, *, site: str, username: str) -> str:
         """
         # pypasscrypt.storagehandler.EPC.get_password
         ----------------------------------
@@ -2232,9 +2376,9 @@ class EPC:
         site_usernames = data.get_usernames_by_site(site=site)
 
         return list(set(all_usernames) - set(site_usernames))
-
-
-
+        
+    def __str__(self) -> str:
+        return str(self.load("Display the EPC object."))
 
 
 class EPT:
@@ -2325,9 +2469,9 @@ class EPT:
         if not isinstance(data, PasswordBucket):
             raise InvalidPasswordBucketError("Invalid data")
         
-        if not file_path.endswith(EPC.FILE_EXTENSION):
+        if not file_path.endswith(EPT.FILE_EXTENSION):
             raise ValueError(
-                f"Only {EPC.FILE_EXTENSION} files are supported.")
+                f"Only {EPT.FILE_EXTENSION} files are supported.")
 
         counter: int = 1
         new_file_path: str = file_path
@@ -2425,9 +2569,10 @@ class EPT:
         
         try:
             with open(file_path, 'rb') as file:
+                file.seek(0)
 
                 # Verify the file version
-                if HashHandler.verify_hash(
+                if not HashHandler.verify_hash(
                     data=EPT.FILE_VERSION,
                     hash_data=hexlify(file.read(32)).decode(),
                     method="SHA256"
@@ -2435,7 +2580,7 @@ class EPT:
                     raise ValueError("Invalid file version")
 
                 # Verify the password hash
-                if HashHandler.verify_hash(
+                if not HashHandler.verify_hash(
                     data=secret,
                     hash_data=hexlify(file.read(32)).decode(),
                     method="SHA256"
@@ -2481,21 +2626,3 @@ class EPT:
             raise InvalidEPTFileError(message="Invalid file") from e
 
         return data
-
-
-new = EPC.create(secret="password", symmetric_encryption_type="AES", hash_type="SHA256", file_path="test.epc")
-try:
-    epc = EPC(
-        file_path=new,
-        secret="password",
-        symmetric_encryption_type="AES",
-        hash_type="SHA256",
-        logger=Logger("Test")
-    )
-
-    epc.add_password(site="Google", username="tejus", password="password")
-    epc.add_password(site="Google", username="tejus1", password="password")
-
-except Exception as e:
-    os.remove(new)
-    raise e

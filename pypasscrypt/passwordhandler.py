@@ -539,10 +539,10 @@ class PassCryptPasswordManager(IPasswordManagerHandler):
         # Generate password options based on context and allowed characters
         password_options: List[str] = []
         for _ in range(PassCryptPasswordManager.EPOCHS):
-            password_parts: List[str] = sample(allowed_chars, length*2)
+            password_parts: List[str] = [choice(allowed_chars) for _ in range(length*2)]
             password_parts[randint(0, length*2 - 1)] = choice(context_list) if context_list else choice(allowed_chars)
             password_str: str = ''.join(password_parts)
-            slice_index: int = randint(0, len(password_str) - length)
+            slice_index: int = randint(0, len(password_str) - (length + 1))
             password_options.append(
                 password_str[slice_index: length + slice_index])
 

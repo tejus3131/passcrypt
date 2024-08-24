@@ -42,6 +42,7 @@ Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
 """
 
 # Metadata
+from tqdm import tqdm
 __version__ = '2.0.0'
 __author__ = 'Tejus Gupta'
 __email__ = 'tejus3131@gmail.com'
@@ -71,9 +72,12 @@ __all__ = [
     '__status__'
 ]
 
+from datetime import datetime
 import os
 import base64
 import hashlib
+from random import choice, randint
+from string import printable
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers.modes import CFB
@@ -110,6 +114,9 @@ from typing import (
     Tuple,
     get_args
 )
+
+from pypasscrypt.userinterface import UI, UIPanelDisplay, UITableDisplay
+from tqdm import tqdm
 
 
 class DecryptionFailedError(Exception):
@@ -181,7 +188,7 @@ class ISymmetricCryptoHandler(ABC):
         """
         # pypasscrypt.cryptohandler.ISymmetricCryptoHandler._get_cipher
         ---------------------------------------------------------
-        
+
         Generate a cipher object using the input string as the key.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,7 +223,7 @@ class ISymmetricCryptoHandler(ABC):
         ------------------------------------------------------
 
         Encrypt the given data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -250,7 +257,7 @@ class ISymmetricCryptoHandler(ABC):
         ------------------------------------------------------
 
         Decrypt the given encrypted data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -299,7 +306,7 @@ class FernetSymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         # pypasscrypt.cryptohandler.FernetSymmetricCryptoHandler._get_cipher
         ---------------------------------------------------------
-        
+
         Generate a cipher object using the input string as the key.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -338,7 +345,7 @@ class FernetSymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Encrypt the given data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -365,11 +372,12 @@ class FernetSymmetricCryptoHandler(ISymmetricCryptoHandler):
 
         if not isinstance(data, str):
             raise TypeError("Invalid data")
-        
+
         if not isinstance(password, str):
             raise TypeError("Invalid password")
 
-        cipher: Fernet = FernetSymmetricCryptoHandler._get_cipher(input_string=password)
+        cipher: Fernet = FernetSymmetricCryptoHandler._get_cipher(
+            input_string=password)
         encrypted_data: bytes = cipher.encrypt(data.encode())
         return encrypted_data
 
@@ -380,7 +388,7 @@ class FernetSymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Decrypt the given encrypted data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -407,16 +415,17 @@ class FernetSymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         if not isinstance(password, str):
             raise TypeError("The password must be a string.")
-        
+
         if not isinstance(encrypted_data, bytes):
             raise TypeError("The encrypted data must be bytes.")
 
-        cipher: Fernet = FernetSymmetricCryptoHandler._get_cipher(input_string=password)
+        cipher: Fernet = FernetSymmetricCryptoHandler._get_cipher(
+            input_string=password)
         try:
             decrypted_data: bytes = cipher.decrypt(encrypted_data)
         except Exception as e:
             raise DecryptionFailedError("Decryption failed.") from e
-        
+
         return decrypted_data.decode()
 
 
@@ -441,7 +450,7 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         # pypasscrypt.cryptohandler.AESSymmetricCryptoHandler._get_cipher
         ---------------------------------------------------------
-        
+
         Generate a cipher object using the input string as the key.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -480,7 +489,7 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Encrypt the given data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -508,7 +517,8 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
         if not isinstance(data, str):
             raise TypeError("Invalid data")
 
-        cipher, iv = AESSymmetricCryptoHandler._get_cipher(input_string=password)
+        cipher, iv = AESSymmetricCryptoHandler._get_cipher(
+            input_string=password)
         encryptor = cipher.encryptor()
         encrypted_data = encryptor.update(
             data.encode()) + encryptor.finalize()
@@ -522,7 +532,7 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Decrypt the given encrypted data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -548,10 +558,12 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
         Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
         """
         if not isinstance(password, str):
-            raise TypeError("The password must be a string.") from TypeError(password)
-        
+            raise TypeError(
+                "The password must be a string.") from TypeError(password)
+
         if not isinstance(encrypted_data, bytes):
-            raise TypeError("The encrypted data must be bytes.") from TypeError(encrypted_data)
+            raise TypeError("The encrypted data must be bytes.") from TypeError(
+                encrypted_data)
 
         try:
             iv = encrypted_data[:16]
@@ -564,7 +576,7 @@ class AESSymmetricCryptoHandler(ISymmetricCryptoHandler):
                 ciphertext) + decryptor.finalize()
         except Exception as e:
             raise DecryptionFailedError("Decryption failed.") from e
-                
+
         return decrypted_data.decode()
 
 
@@ -589,7 +601,7 @@ class PBKDF2SymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         # pypasscrypt.cryptohandler.PBKDF2SymmetricCryptoHandler._get_cipher
         ---------------------------------------------------------
-        
+
         Generate a cipher object using the input string as the key.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -635,7 +647,7 @@ class PBKDF2SymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Encrypt the given data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -680,7 +692,7 @@ class PBKDF2SymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Decrypt the given encrypted data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -707,7 +719,7 @@ class PBKDF2SymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         if not isinstance(password, str):
             raise TypeError("The password must be a string.")
-        
+
         if not isinstance(encrypted_data, bytes):
             raise TypeError("The encrypted data must be bytes.")
 
@@ -729,7 +741,7 @@ class PBKDF2SymmetricCryptoHandler(ISymmetricCryptoHandler):
                 ciphertext) + decryptor.finalize()
         except Exception as e:
             raise DecryptionFailedError("Decryption failed.") from e
-                
+
         return decrypted_data.decode()
 
 
@@ -755,7 +767,7 @@ class ChaCha20SymmetricCryptoHandler(ISymmetricCryptoHandler):
         # pypasscrypt.cryptohandler.ChaCha20SymmetricCryptoHandler._get_cipher
         ----------------------------------------------------------
         ---------------------------------------------------------
-        
+
         Generate a cipher object using the input string as the key.
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -794,7 +806,7 @@ class ChaCha20SymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Encrypt the given data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -838,7 +850,7 @@ class ChaCha20SymmetricCryptoHandler(ISymmetricCryptoHandler):
         ------------------------------------------------------
 
         Decrypt the given encrypted data using the provided password.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -865,7 +877,7 @@ class ChaCha20SymmetricCryptoHandler(ISymmetricCryptoHandler):
         """
         if not isinstance(password, str):
             raise TypeError("The password must be a string.")
-        
+
         if not isinstance(encrypted_data, bytes):
             raise TypeError("The encrypted data must be bytes.")
 
@@ -879,7 +891,7 @@ class ChaCha20SymmetricCryptoHandler(ISymmetricCryptoHandler):
             decrypted_data: bytes = decryptor.update(ciphertext)
         except Exception as e:
             raise DecryptionFailedError("Decryption failed.") from e
-                
+
         return decrypted_data.decode()
 
 
@@ -986,7 +998,7 @@ class SymmetricCryptoHandler:
         - `AES`: AES symmetric encryption.
         - `PBKDF2`: Key derivation using PBKDF2 and AES encryption.
         - `ChaCha20`: ChaCha20 symmetric encryption.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1014,10 +1026,10 @@ class SymmetricCryptoHandler:
 
         if not isinstance(data, str):
             raise TypeError("Invalid data")
-        
+
         if not isinstance(password, str):
             raise TypeError("Invalid password")
-        
+
         if method not in get_args(SymmetricEncryptionTypes):
             raise InvalidSymmetricEncryptionTypeError(
                 message="Unsupported symmetric encryption method.") from TypeError(method)
@@ -1064,7 +1076,7 @@ class SymmetricCryptoHandler:
         - `AES`: AES symmetric encryption.
         - `PBKDF2`: Key derivation using PBKDF2 and AES encryption.
         - `ChaCha20`: ChaCha20 symmetric encryption.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1092,10 +1104,10 @@ class SymmetricCryptoHandler:
 
         if not isinstance(encrypted_data, bytes):
             raise TypeError("Invalid data")
-        
+
         if not isinstance(password, str):
             raise TypeError("Invalid password")
-        
+
         if method not in get_args(SymmetricEncryptionTypes):
             raise InvalidSymmetricEncryptionTypeError(
                 message="Unsupported symmetric encryption method.") from TypeError(method)
@@ -1157,7 +1169,7 @@ class IAsymmetricCryptoHandler(ABC):
         -----------------------------------------------------------------
 
         Generate a new private-public key pair.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Returns: 
@@ -1178,7 +1190,7 @@ class IAsymmetricCryptoHandler(ABC):
         ----------------------------------------------------------
 
         Encrypt the given data using the provided public key.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1213,7 +1225,7 @@ class IAsymmetricCryptoHandler(ABC):
         --------------------------------------------------
 
         Decrypt the given encrypted data using the provided private key.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1268,7 +1280,7 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
         -----------------------------------------------------------------
 
         Generate a new private-public key pair.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Returns: 
@@ -1306,7 +1318,7 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
         --------------------------------------------------
 
         Encrypt the given data using the provided RSA public key.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1334,15 +1346,17 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
 
         if not isinstance(data, str):
             raise TypeError("Invalid data") from ValueError(data)
-        
+
         if not isinstance(public_key_pem, bytes):
-            raise TypeError("Invalid public_key_pem") from ValueError(public_key_pem)
+            raise TypeError("Invalid public_key_pem") from ValueError(
+                public_key_pem)
 
         public_key: PublicKeyTypes = serialization.load_pem_public_key(
             public_key_pem, backend=default_backend())
-        
+
         if not isinstance(public_key, RSAPublicKey):
-            raise ValueError("Invalid RSA public key.") from ValueError(public_key)
+            raise ValueError(
+                "Invalid RSA public key.") from ValueError(public_key)
 
         encrypted_data = public_key.encrypt(
             data.encode(),
@@ -1361,7 +1375,7 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
         --------------------------------------------------
 
         Decrypt the given encrypted data using the provided RSA private key.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1389,7 +1403,7 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
 
         if not isinstance(private_key_pem, bytes):
             raise TypeError("Invalid private_key_pem")
-        
+
         if not isinstance(encrypted_data, bytes):
             raise TypeError("Invalid encrypted_data")
 
@@ -1397,7 +1411,7 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
             private_key_pem, password=None, backend=default_backend())
         if not isinstance(private_key, RSAPrivateKey):
             raise ValueError("Invalid RSA private key.")
-        
+
         try:
             decrypted_data = private_key.decrypt(
                 encrypted_data,
@@ -1409,9 +1423,9 @@ class RSAAsymmetricCryptoHandler(IAsymmetricCryptoHandler):
             )
         except Exception as e:
             raise DecryptionFailedError("Decryption failed.") from e
-        
+
         return decrypted_data.decode()
-    
+
 
 AsymmetricEncryptionTypes = Literal["RSA"]
 """
@@ -1498,7 +1512,7 @@ class AsymmetricCryptoHandler:
         -----------------------------------------------------------------
 
         Generate a new private-public key pair using the provided encryption method.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Supported types:
@@ -1541,9 +1555,9 @@ class AsymmetricCryptoHandler:
         """
         # pypasscrypt.cryptohandler.AsymmetricCryptoHandler.encrypt
         --------------------------------------------------------
-        
+
         Encrypt the given data using the provided public key and encryption method.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Supported types:
@@ -1575,10 +1589,10 @@ class AsymmetricCryptoHandler:
 
         Author: `Tejus Gupta` <`@tejus3131`, tejus3131@gmail.com>
         """
-        
+
         if not isinstance(public_key_pem, bytes):
             raise TypeError("Invalid public_key_pem")
-        
+
         if method not in get_args(AsymmetricEncryptionTypes):
             raise InvalidAsymmetricEncryptionTypeError(
                 message="Unsupported asymmetric encryption method.") from TypeError(method)
@@ -1601,7 +1615,7 @@ class AsymmetricCryptoHandler:
         --------------------------------------------------------
 
         Decrypt the given encrypted data using the provided private key and encryption method.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Supported types:
@@ -1636,10 +1650,10 @@ class AsymmetricCryptoHandler:
 
         if not isinstance(private_key_pem, bytes):
             raise TypeError("Invalid private_key_pem")
-        
+
         if not isinstance(encrypted_data, bytes):
             raise TypeError("Invalid encrypted_data")
-        
+
         if method not in get_args(AsymmetricEncryptionTypes):
             raise InvalidAsymmetricEncryptionTypeError(
                 message="Unsupported asymmetric encryption method.") from TypeError(method)
@@ -1686,7 +1700,7 @@ class IHashHandler(ABC):
         ------------------------------------------
 
         Hash the given data.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1713,7 +1727,7 @@ class IHashHandler(ABC):
         -------------------------------------------------
 
         Verify the given data.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1733,7 +1747,7 @@ class IHashHandler(ABC):
         """
         pass
 
-    
+
 class SHA256HashHandler(IHashHandler):
     """
     # pypasscrypt.hashhandler.SHA256HashHandler
@@ -1760,7 +1774,7 @@ class SHA256HashHandler(IHashHandler):
         --------------------------------------------------------
 
         Hash the given data using SHA-256.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1784,7 +1798,7 @@ class SHA256HashHandler(IHashHandler):
         hasher = hashlib.sha256()
         hasher.update(data.encode())
         return hasher.hexdigest()
-    
+
     @staticmethod
     def verify_hash(*, data: str, hash_data: str) -> bool:
         """
@@ -1792,7 +1806,7 @@ class SHA256HashHandler(IHashHandler):
         ------------------------------------------------------
 
         Verify the given data using the hash.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Parameters:
@@ -1813,12 +1827,12 @@ class SHA256HashHandler(IHashHandler):
 
         if not isinstance(data, str):
             raise TypeError("Invalid data")
-        
+
         if not isinstance(hash_data, str):
             raise TypeError("Invalid hash")
 
         return SHA256HashHandler.generate_hash(data=data) == hash_data
-    
+
 
 HashTypes = Literal["SHA256"]
 """
@@ -1903,7 +1917,7 @@ class HashHandler:
         --------------------------------------------------
 
         Hash the given data using the provided hash method.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Supported types:
@@ -1937,9 +1951,10 @@ class HashHandler:
 
         if not isinstance(data, str):
             raise TypeError("Invalid data")
-        
+
         if method not in get_args(HashTypes):
-            raise InvalidHashTypeError(message="Unsupported hash method.") from TypeError(method)
+            raise InvalidHashTypeError(
+                message="Unsupported hash method.") from TypeError(method)
 
         if method == "SHA256":
             return SHA256HashHandler.generate_hash(data=data)
@@ -1951,7 +1966,7 @@ class HashHandler:
         ------------------------------------------------
 
         Verify the given data using the hash method.
-        
+
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Supported types:
@@ -1986,12 +2001,80 @@ class HashHandler:
 
         if not isinstance(data, str):
             raise TypeError("Invalid data")
-        
+
         if not isinstance(hash_data, str):
             raise TypeError("Invalid hash")
-        
+
         if method not in get_args(HashTypes):
-            raise InvalidHashTypeError(message="Unsupported hash method.") from TypeError(method)
+            raise InvalidHashTypeError(
+                message="Unsupported hash method.") from TypeError(method)
 
         if method == "SHA256":
             return SHA256HashHandler.verify_hash(data=data, hash_data=hash_data)
+
+
+def main():
+
+    def test(method_1, method_2, data, password): return SymmetricCryptoHandler.decrypt(
+        encrypted_data=SymmetricCryptoHandler.encrypt(
+            data=SymmetricCryptoHandler.decrypt(
+                encrypted_data=SymmetricCryptoHandler.encrypt(
+                    data=data,
+                    password=password,
+                    method=method_2
+                ),
+                password=password,
+                method=method_2
+            ),
+            password=password,
+            method=method_1
+        ),
+        password=password,
+        method=method_1
+    ) == data
+
+    rows = []
+
+    ui = UI()
+
+    ui.clear_all()
+
+    navbar = UIPanelDisplay(
+        title="Symmetric Encryption Test",
+        subtitle="Testing the encryption and decryption of data using various symmetric encryption methods.",
+        message="This test will check if the data can be encrypted and decrypted successfully using the provided password and encryption methods."
+    )
+
+    ui.render(component=navbar)
+
+    print("\n\n")
+
+    for i in tqdm(range(25), desc="Testing", unit="test", unit_scale=True):
+
+        methods = list(get_args(SymmetricEncryptionTypes))
+        method_1 = choice(methods)
+        methods.remove(method_1)
+        method_2 = choice(methods)
+
+        data = "".join(choice(printable) for _ in range(randint(1000, 10000)))
+
+        password = "".join(choice(printable) for _ in range(randint(10, 20)))
+
+        rows.append([str(i+1), str(datetime.now().isoformat()), str(method_1),
+                    str(method_2), str(test(method_1, method_2, data, password))])
+    
+    print("\n\n")
+
+    headings = ["#", "Timestamp", "Method 1", "Method 2", "Result"]
+
+    table = UITableDisplay(
+        title="Symmetric Encryption Test",
+        headings=headings,
+        rows=rows
+    )
+
+    ui.render(component=table)
+
+
+if __name__ == "__main__":
+    main()

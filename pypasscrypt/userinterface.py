@@ -1680,6 +1680,7 @@ class UITableDisplay(IUIComponent):
         if self.index:
             for i, row in enumerate(self.rows, start=1):
                 table.add_row(str(i), *row)
+                print(i, row)
 
         else:
             for row in self.rows:

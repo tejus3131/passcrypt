@@ -1,5 +1,6 @@
 import os
 from logging import config
+from time import sleep
 from typing import Any, List, Optional, Tuple, get_args
 from pypasscrypt import (
     # connection
@@ -20,7 +21,7 @@ from pypasscrypt import (
 
     # userinterface
     UI,
-    UIMessageDisplay,
+    UINotificationDisplay,
     UINotificationDisplay,
     UIPanelDisplay,
     UITableDisplay,
@@ -35,7 +36,9 @@ from pypasscrypt import (
     UIFileInput
 )
 from passcrypt_cli.config import Config
+from pypasscrypt.storagehandler import InvalidEPCFileError
 from pypasscrypt.connectionhandler import ConnectionProtocolHandler, InvalidConnectionProtocolError
+
 from pyperclip import copy  # type: ignore
 
 
@@ -47,14 +50,15 @@ class PasscryptCLI:
         self.secret: str
         self.storage: EPC
 
-    def start(self) -> None:
+    def start(self, animate: bool) -> None:
         try:
-            self.ui.animate(
-                message="Welcome to Passcrypt CLI",
-                title="Passcrypt CLI",
-                wait_time=1.0,
-                border_style="magenta"
-            )
+            if animate:
+                self.ui.animate(
+                    message="Welcome to Passcrypt CLI",
+                    title=f"Passcrypt CLI",
+                    wait_time=1.0,
+                    border_style="magenta"
+                )
 
             users: List[str] = self.config.get_users()
 
@@ -70,7 +74,7 @@ class PasscryptCLI:
     def setup(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Setup",
+            title=f"PassCrypt - Setup",
             subtitle="Press ctrl+c to exit",
             message="Welcome to Passcrypt CLI. This is a one-time setup process to configure your account settings."
         )
@@ -110,8 +114,8 @@ class PasscryptCLI:
 
     def modify_config(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Modify Configuration",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Modify Configuration",
+            subtitle="Press ctrl+c to go to main menu",
             message="Modify your account settings, connection settings, encryption settings, and password settings."
         )
         def __modify_config() -> None:
@@ -140,6 +144,7 @@ class PasscryptCLI:
 
             elif mutable == "Storage Settings":
                 self.modify_storage_settings()
+            __modify_config()
 
         try:
             __modify_config()
@@ -149,8 +154,8 @@ class PasscryptCLI:
     def modify_account_settings(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Account Settings (Changing Username)",
-            subtitle="Press ctrl+c to cancel",
+            title=f"PassCrypt - {self.user} - Account Settings (Changing Username)",
+            subtitle="Press ctrl+c to go to settings",
             message="Change your username."
         )
         def __modify_username() -> None:
@@ -166,7 +171,7 @@ class PasscryptCLI:
                 self.user = user
 
         @self.ui.page(
-            title="PassCrypt - Account Settings (Changing Master Password)",
+            title=f"PassCrypt - {self.user} - Account Settings (Changing Master Password)",
             subtitle="Press ctrl+c to cancel",
             message="Change your master password.",
             style="error"
@@ -177,15 +182,21 @@ class PasscryptCLI:
             if not self.storage:
                 self.storage = self.config.get_storage(
                     username=self.user, secret=self.secret)
+                
+            try:
 
-            self.storage.change_secret(
-                new_secret=self.ui.render(component=master_password_input)
-            )
+                self.storage.change_secret(
+                    new_secret=self.ui.render(component=master_password_input)
+                )
 
-            self.secret = self.storage.secret
+                self.secret = self.storage.secret
+            except Exception as e:
+                print(e)
+                sleep(5)
+                raise e
 
         @self.ui.page(
-            title="PassCrypt - Account Settings(Deleting Account)",
+            title=f"PassCrypt - {self.user} - Account Settings(Deleting Account)",
             subtitle="Press ctrl+c to cancel",
             message="This action is irreversible. Deleting your account will delete all your passwords and settings.",
             style="error"
@@ -197,26 +208,30 @@ class PasscryptCLI:
             )
 
             if not self.ui.render(component=confirm_input):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Account deletion cancelled",
                     style="info"
                 ))
                 return
-
+            
             self.config.delete(username=self.user)
-            self.ui.exit(exit_message="Account deleted successfully")
-            self.start()
+            self.ui.render(component=UINotificationDisplay(
+                message="Account deleted successfully",
+                style="success"
+            ))
+            self.start(animate=False)
+            exit(code=0)
 
         @self.ui.page(
-            title="PassCrypt - Account Settings",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Account Settings",
+            subtitle="Press ctrl+c to cancel",
             message="Change your username and master password."
         )
         def __modify_account_settings() -> None:
 
             account_settings = UISingleSelectionInput(
                 message="Select an account setting to modify",
-                choices=["Change Username", "Change Master Password"],
+                choices=["Change Username", "Change Master Password", 'Delete Account'],
                 skip_message="Cancel"
             )
 
@@ -231,6 +246,10 @@ class PasscryptCLI:
 
                 elif account_setting == "Change Master Password":
                     __modify_master_password()
+
+                elif account_setting == "Delete Account":
+                    __delete_account()
+
             except KeyboardInterrupt:
                 pass
             finally:
@@ -245,8 +264,8 @@ class PasscryptCLI:
 
     def modify_connection_settings(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Connection Settings(Changing Connection Port)",
-            subtitle="Press ctrl+c to skip",
+            title=f"PassCrypt - {self.user} - Connection Settings(Changing Connection Port)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your default connection port."
         )
         def __modify_connection_port() -> None:
@@ -278,8 +297,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Connection Settings(Changing Connection Protocol)",
-            subtitle="Press ctrl+c to skip",
+            title=f"PassCrypt - {self.user} - Connection Settings(Changing Connection Protocol)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your default connection protocol."
         )
         def __modify_connection_protocol() -> None:
@@ -304,8 +323,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Connection Settings",
-            subtitle="Press ctrl+c to cancel",
+            title=f"PassCrypt - {self.user} - Connection Settings",
+            subtitle="Press ctrl+c to go to main menu",
             message="Change your default connection port and protocol."
         )
         def __modify_connection_settings() -> None:
@@ -339,8 +358,8 @@ class PasscryptCLI:
 
     def modify_encryption_settings(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Encryption Settings(Changing Symmetric Encryption Type)",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Encryption Settings(Changing Symmetric Encryption Type)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your symmetric encryption settings.",
             style="error"
         )
@@ -370,8 +389,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Encryption Settings(Changing Asymmetric Encryption Type)",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Encryption Settings(Changing Asymmetric Encryption Type)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your asymmetric encryption settings."
         )
         def __modify_asymmetric_encryption_type() -> None:
@@ -396,8 +415,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Encryption Settings(Changing Hash Type)",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Encryption Settings(Changing Hash Type)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your hashing settings.",
             style="error"
         )
@@ -425,8 +444,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Encryption Settings",
-            subtitle="Press ctrl+c to cancel",
+            title=f"PassCrypt - {self.user} - Encryption Settings",
+            subtitle="Press ctrl+c to go to main menu",
             message="Change your symmetric encryption type, asymmetric encryption type, and hash type."
         )
         def __modify_encryption_settings() -> None:
@@ -463,8 +482,8 @@ class PasscryptCLI:
 
     def modify_password_settings(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Password Settings(Changing Password Manager Type)",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Password Settings(Changing Password Manager Type)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your password manager settings."
         )
         def __modify_password_manager_type() -> None:
@@ -489,8 +508,8 @@ class PasscryptCLI:
             )
 
         @self.ui.page(
-            title="PassCrypt - Password Settings(Changing Password Generation Rules)",
-            subtitle="Press ctrl+c to skip this step",
+            title=f"PassCrypt - {self.user} - Password Settings(Changing Password Generation Rules)",
+            subtitle="Press ctrl+c to cancel",
             message="Change your password generation settings."
         )
         def __modify_password_generation_rule() -> None:
@@ -590,8 +609,8 @@ class PasscryptCLI:
                 )
 
         @self.ui.page(
-            title="PassCrypt - Password Settings",
-            subtitle="Press ctrl+c to cancel",
+            title=f"PassCrypt - {self.user} - Password Settings",
+            subtitle="Press ctrl+c to go to main menu",
             message="Change your password manager type and password generation rules."
         )
         def __modify_password_settings() -> None:
@@ -627,7 +646,54 @@ class PasscryptCLI:
     def modify_storage_settings(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Share Password",
+            title=f"PassCrypt - {self.user} - Reverting Commit",
+            subtitle="Press ctrl+c to cancel",
+            message="This will revert all the changes after any selected commit",
+            style="error"
+        )
+        def __revert_to_commit() -> None:
+            commits = self.storage.load_commits()
+
+            choices = [f"{idx:>3}: {data[1]}" for idx, data in enumerate(commits)]
+
+            selection_input = UISingleSelectionInput(
+                message="Select commit to revert to.",
+                choices=choices,
+                skip_message="Cancel"
+            )
+
+            selection = self.ui.render(component=selection_input)
+
+            if not selection:
+                self.ui.render(component=UINotificationDisplay(
+                    message="Reverting cancelled"
+                ))
+
+            self.ui.render(component=UIPanelDisplay(
+                title="WARNING",
+                message="This will revert all the changes after the selected commit. Do you want to continue?",
+                subtitle="press ctrl+c to cancel",
+                style="warning"
+            ))
+
+            if not self.ui.render(component=UIConfirmInput(
+                message=f"Do you want to commit to {selection}",
+                default=False
+            )):
+                self.ui.render(component=UINotificationDisplay(
+                    message="Reverting cancelled"
+                ))
+                return
+            
+            self.storage.revert_to_commit(commit_hash=commits[choices.index(selection)][0])
+
+            self.ui.render(component=UINotificationDisplay(
+                message="Reverted to selected commit",
+                style="success"
+            ))
+
+        @self.ui.page(
+            title=f"PassCrypt - {self.user} - Share Password",
             subtitle="Press ctrl+c to cancel",
             message="Share password to other users on network.",
             style="error"
@@ -646,7 +712,7 @@ class PasscryptCLI:
             selected: List[str] = self.ui.render(component=selections_input)
 
             if not selected:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords selected, Cancelling share",
                     style="info"
                 ))
@@ -673,7 +739,7 @@ class PasscryptCLI:
                 )
 
             except ValueError:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Invalid connection code",
                     style="error"
                 ))
@@ -687,26 +753,26 @@ class PasscryptCLI:
                         username=self.user).CONNECTION_PROTOCOL
                 )
             except ValueError:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Failed to share password",
                     style="error"
                 ))
                 return
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password shared successfully",
                 style="success"
             ))
 
         @self.ui.page(
-            title="PassCrypt - Recieve Password (Saving Data)",
+            title=f"PassCrypt - {self.user} - Recieve Password (Saving Data)",
             subtitle="Press ctrl+c to cancel",
             message="Save",
             style="error"
         )
         def __save_data(data: PasswordBucket) -> None:
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password recieved successfully",
                 style="success"
             ))
@@ -728,24 +794,24 @@ class PasscryptCLI:
             )
 
             if not self.ui.render(component=confirm_input):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Password not saved",
                     style="info"
                 ))
                 return
 
             self.storage.import_data(new_data=data)
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password saved successfully",
                 style="success"
             ))
 
         @self.ui.page(
-            title="PassCrypt - Recieve Password",
+            title=f"PassCrypt - {self.user} - Recieve Password",
             subtitle="Press ctrl+c to cancel",
             message="Recieve passwords from other users on network."
         )
-        def __recieve_password() -> Any:
+        def __request_password() -> Any:
 
             asymmetric_encryption_type = self.config.read(
                 username=self.user).ASYMMETRIC_ENCRYPTION_TYPE
@@ -779,7 +845,7 @@ class PasscryptCLI:
                     asymmetric_encryption_type=asymmetric_encryption_type
                 )
             except Exception:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Error recieving password",
                     style="error"
                 ))
@@ -788,7 +854,7 @@ class PasscryptCLI:
             return data
 
         @self.ui.page(
-            title="PassCrypt - Storage Settings(Importing Storage)",
+            title=f"PassCrypt - {self.user} - Storage Settings(Importing Storage)",
             subtitle="Press ctrl+c to cancel",
             message="Importing passwords will overwrite the existing passwords. Only import from trusted sources.",
             style="error"
@@ -816,7 +882,7 @@ class PasscryptCLI:
                 file_data: PasswordBucket = EPT.load(
                     file_path=storage_file, secret=secret)
             except ValueError:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Invalid decryption key",
                     style="error"
                 ))
@@ -830,7 +896,7 @@ class PasscryptCLI:
             ))
 
             if not self.ui.render(component=UIConfirmInput(message="Continue?")):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Import cancelled",
                     style="info"
                 ))
@@ -840,13 +906,13 @@ class PasscryptCLI:
                 new_data=file_data
             )
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Storage imported successfully",
                 style="success"
             ))
 
         @self.ui.page(
-            title="PassCrypt - Storage Settings(Exporting Storage)",
+            title=f"PassCrypt - {self.user} - Storage Settings(Exporting Storage)",
             subtitle="Press ctrl+c to cancel",
             message="Exporting passwords will create a new file with the selected passwords.",
             style="error"
@@ -856,7 +922,7 @@ class PasscryptCLI:
             listings = self.storage.get_listings()
 
             if len(listings) == 0:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords found",
                     style="warning"
                 ))
@@ -874,7 +940,7 @@ class PasscryptCLI:
             selected: List[str] = self.ui.render(component=selection_input)
 
             if not selected:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords selected, Cancelling export",
                     style="info"
                 ))
@@ -909,7 +975,7 @@ class PasscryptCLI:
             ))
 
             if not self.ui.render(component=UIConfirmInput(message="Continue?")):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Export cancelled",
                     style="info"
                 ))
@@ -922,13 +988,13 @@ class PasscryptCLI:
                 file_path=self.config.read(username=self.user).EXPORT_FILE_NAME
             )
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message=f"Storage exported successfully at {file_path}",
                 style="success"
             ))
 
         self.ui.page(
-            title="PassCrypt - Storage Settings",
+            title=f"PassCrypt - {self.user} - Storage Settings",
             subtitle="Press ctrl+c to cancel",
             message="Change your storage settings.",
             style="error"
@@ -942,7 +1008,7 @@ class PasscryptCLI:
             )
 
             if not self.ui.render(component=config_input):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Export cancelled",
                     style="info"
                 ))
@@ -950,13 +1016,13 @@ class PasscryptCLI:
 
             file_path = self.config.export_config(username=self.user)
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message=f"Settings exported successfully at {file_path}",
                 style="success"
             ))
 
         self.ui.page(
-            title="PassCrypt - Storage Settings",
+            title=f"PassCrypt - {self.user} - Storage Settings",
             subtitle="Press ctrl+c to cancel",
             message="Importing settings will overwrite the existing settings and delete all your passwords. Consider backing up your data before importing settings.",
             style="error"
@@ -980,7 +1046,7 @@ class PasscryptCLI:
             secret = self.ui.render(component=master_password_input)
 
             if secret != self.secret:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Invalid master password",
                     style="error"
                 ))
@@ -999,7 +1065,7 @@ class PasscryptCLI:
             )
 
             if not self.ui.render(component=config_input):
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Import cancelled",
                     style="info"
                 ))
@@ -1008,23 +1074,37 @@ class PasscryptCLI:
             self.config.import_config(
                 username=self.user, file_path=config_file, secret=secret)
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Settings imported successfully",
                 style="success"
             ))
 
+        def __recieve_password():
+            data = __request_password()
+            if data:
+                __save_data(data=data)
+
         self.ui.page(
-            title="PassCrypt - Storage Settings",
-            subtitle="Press ctrl+c to cancel",
+            title=f"PassCrypt - {self.user} - Storage Settings",
+            subtitle="Press ctrl+c to go to main menu",
             message="Change your storage settings."
         )
 
         def __modify_storage_settings() -> None:
 
+            choices={
+                "Revert to Previous Commit": __revert_to_commit,
+                "Import Storage": __import_storage, 
+                "Export Storage": __export_storage, 
+                "Share Password": __share_password,
+                "Recieve Password": __recieve_password, 
+                "Import Settings": __import_storage_settings, 
+                "Export Settings": __export_storage_settings
+            }
+
             storage_settings = UISingleSelectionInput(
                 message="Select a storage setting to modify",
-                choices=["Import Storage", "Export Storage", "Share Password",
-                         "Recieve Password", "Import Settings", "Export Settings"],
+                choices=list(choices.keys()),
                 skip_message="Cancel"
             )
 
@@ -1032,28 +1112,9 @@ class PasscryptCLI:
 
             if not storage_setting:
                 return
-
-            try:
-                if storage_setting == "Import Storage":
-                    __import_storage()
-
-                elif storage_setting == "Export Storage":
-                    __export_storage()
-
-                elif storage_setting == "Export Settings":
-                    __export_storage_settings()
-
-                elif storage_setting == "Import Settings":
-                    __import_storage_settings()
-
-                elif storage_setting == "Share Password":
-                    __share_password()
-
-                elif storage_setting == "Recieve Password":
-                    data = __recieve_password()
-                    if data:
-                        __save_data(data=data)
-
+            
+            try:            
+                choices[storage_setting]()
             except KeyboardInterrupt:
                 pass
             finally:
@@ -1066,7 +1127,7 @@ class PasscryptCLI:
 
     def login(self, users: List[str]) -> None:
         @self.ui.page(
-            title="PassCrypt - Login",
+            title=f"PassCrypt - Login",
             subtitle="Press ctrl+c to exit",
             message="Login to your account."
         )
@@ -1074,7 +1135,7 @@ class PasscryptCLI:
             username_input = UISingleSelectionInput(
                 message="Select your username",
                 choices=_users + ["Create new user"],
-                skip_message="Exit"
+                default=users[0]
             )
 
             user: Optional[str] = self.ui.render(component=username_input)
@@ -1090,27 +1151,31 @@ class PasscryptCLI:
                 message=f"Enter master password for {self.user}"
             )
 
-            secret = self.ui.render(component=secret_input)
+            secret = None
 
-            if not secret:
-                raise ValueError("Invalid master password")
-            else:
-                self.secret = secret
-            try:
-                self.storage = self.config.get_storage(
-                    username=self.user, secret=self.secret)
-            except ValueError:
-                self.ui.render(component=UINotificationDisplay(
-                    message="Invalid master password",
-                    style="error"
-                ))
-                __login(_users=_users)
+            while not secret:
+
+                secret = self.ui.render(component=secret_input)
+
+                if not secret:
+                    raise ValueError("Invalid master password")
+                else:
+                    self.secret = secret
+                try:
+                    self.storage = self.config.get_storage(
+                        username=self.user, secret=self.secret)
+                except InvalidEPCFileError:
+                    self.ui.render(component=UINotificationDisplay(
+                        message="Invalid master password",
+                        style="error"
+                    ))
+                    secret = None
 
         __login(_users=users)
 
     def mainloop(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Main Menu",
+            title=f"PassCrypt - {self.user} - Main Menu",
             subtitle="Press ctrl+c to exit",
             message="Welcome to Passcrypt CLI. Select an option to proceed."
         )
@@ -1140,23 +1205,19 @@ class PasscryptCLI:
             __main_menu()
         except KeyboardInterrupt:
             self.ui.exit(exit_message="Exiting Passcrypt CLI")
-
-        self.ui.render(component=UINotificationDisplay(
-            message="Returning to main menu",
-            style="info"
-        ))
+            
         self.mainloop()
 
     def view_passwords(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Copy Password",
+            title=f"PassCrypt - {self.user} - Copy Password",
             subtitle="Press ctrl+c to cancel",
             message="Copy your stored password."
         )
         def __copy_passwords(*, _bucket: List[tuple[str, str]]) -> None:
             choices = [
-                f"{idx:>3}: {data[0]:>20} -> {data[1]}" for idx, data in enumerate(_bucket)]
+                f"{idx:<2}:  {data[0]}({data[1]})" for idx, data in enumerate(_bucket, start=1)]
             selection_input = UISingleSelectionInput(
                 message="Select a site/application",
                 choices=choices,
@@ -1167,7 +1228,7 @@ class PasscryptCLI:
                 component=selection_input)
 
             if not selection:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Copying cancelled",
                     style="info"
                 ))
@@ -1178,20 +1239,20 @@ class PasscryptCLI:
                 site=data[0], username=data[1])
             copy(password)
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password copied to clipboard",
                 style="success"
             ))
 
         @self.ui.page(
-            title="PassCrypt - View Passwords",
+            title=f"PassCrypt - {self.user} - View Passwords",
             subtitle="Press ctrl+c to exit",
             message="View your stored passwords."
         )
         def __view_passwords() -> bool:
             bucket: List[Tuple[str, str]] = self.storage.get_listings()
             if len(bucket) == 0:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords found",
                     style="warning"
                 ))
@@ -1224,7 +1285,7 @@ class PasscryptCLI:
     def add_password(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Add Password",
+            title=f"PassCrypt - {self.user} - Add Password",
             subtitle="Press ctrl+c to cancel",
             message="Add a new password."
         )
@@ -1283,7 +1344,7 @@ class PasscryptCLI:
                 password=password
             )
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password added successfully",
                 style="success"
             ))
@@ -1296,7 +1357,7 @@ class PasscryptCLI:
     def update_password(self) -> None:
 
         @self.ui.page(
-            title="PassCrypt - Update Password",
+            title=f"PassCrypt - {self.user} - Update Password",
             subtitle="Press ctrl+c to cancel",
             message="Update a password."
         )
@@ -1305,7 +1366,7 @@ class PasscryptCLI:
             sites = self.storage.get_all_sites()
 
             if len(sites) == 0:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords found",
                     style="warning"
                 ))
@@ -1320,7 +1381,7 @@ class PasscryptCLI:
             site = self.ui.render(component=site_input)
 
             if not site:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Editing cancelled",
                     style="info"
                 ))
@@ -1337,7 +1398,7 @@ class PasscryptCLI:
             username = self.ui.render(component=username_input)
 
             if not username:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Editing cancelled",
                     style="info"
                 ))
@@ -1346,7 +1407,7 @@ class PasscryptCLI:
             return site, username
 
         @self.ui.page(
-            title="PassCrypt - Update Password",
+            title=f"PassCrypt - {self.user} - Update Password",
             subtitle="Press ctrl+c to cancel",
             message="Update a password."
         )
@@ -1374,14 +1435,14 @@ class PasscryptCLI:
                     new_site = site
 
                 if not new_site:
-                    self.ui.render(component=UIMessageDisplay(
+                    self.ui.render(component=UINotificationDisplay(
                         message="Editing cancelled",
                         style="info"
                     ))
                     return
 
                 if new_site == site and change_site:
-                    self.ui.render(component=UIMessageDisplay(
+                    self.ui.render(component=UINotificationDisplay(
                         message="Site/Application name already exists",
                         style="error"
                     ))
@@ -1412,14 +1473,14 @@ class PasscryptCLI:
                     new_username = username
 
                 if not new_username:
-                    self.ui.render(component=UIMessageDisplay(
+                    self.ui.render(component=UINotificationDisplay(
                         message="Editing cancelled",
                         style="info"
                     ))
                     return
 
                 if new_username == username and change_username:
-                    self.ui.render(component=UIMessageDisplay(
+                    self.ui.render(component=UINotificationDisplay(
                         message=f"Username already exists in {new_site}",
                         style="error"
                     ))
@@ -1457,7 +1518,7 @@ class PasscryptCLI:
 
                 break
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password updated successfully",
                 style="success"
             ))
@@ -1471,7 +1532,7 @@ class PasscryptCLI:
 
     def delete_password(self) -> None:
         @self.ui.page(
-            title="PassCrypt - Delete Password",
+            title=f"PassCrypt - {self.user} - Delete Password",
             subtitle="Press ctrl+c to cancel",
             message="Delete a password."
         )
@@ -1480,7 +1541,7 @@ class PasscryptCLI:
             sites = self.storage.get_all_sites()
 
             if len(sites) == 0:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="No passwords found",
                     style="warning"
                 ))
@@ -1495,7 +1556,7 @@ class PasscryptCLI:
             site = self.ui.render(component=site_input)
 
             if not site:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Deletion cancelled",
                     style="info"
                 ))
@@ -1512,7 +1573,7 @@ class PasscryptCLI:
             username = self.ui.render(component=username_input)
 
             if not username:
-                self.ui.render(component=UIMessageDisplay(
+                self.ui.render(component=UINotificationDisplay(
                     message="Deletion cancelled",
                     style="info"
                 ))
@@ -1520,7 +1581,7 @@ class PasscryptCLI:
 
             self.storage.remove_password(site=site, username=username)
 
-            self.ui.render(component=UIMessageDisplay(
+            self.ui.render(component=UINotificationDisplay(
                 message="Password deleted successfully",
                 style="success"
             ))
@@ -1533,7 +1594,7 @@ class PasscryptCLI:
 
 if __name__ == "__main__":
     try:
-        PasscryptCLI().start()
+        PasscryptCLI().start(animate=True)
     except KeyboardInterrupt:
         os.system("cls")
 
